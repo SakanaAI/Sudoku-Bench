@@ -5,7 +5,7 @@
 <p align="center">
   🤗 <a href="https://huggingface.co/datasets/SakanaAI/Sudoku-Bench">[Sudoku-Bench puzzle dataset]</a><br>
   🤗 <a href="https://huggingface.co/datasets/SakanaAI/Sudoku-CTC-Reasoning">[Sudoku-CTC-Reasoning dataset]</a><br>
-  📝 <a href="https://sakana.ai/#">[Blog Post]</a>
+  📝 <a href="https://sakana.ai/sudoku-bench">[Blog Post]</a>
 </p>
 
 Welcome to **Sudoku-Bench** from [SakanaAI](https://sakana.ai/)
