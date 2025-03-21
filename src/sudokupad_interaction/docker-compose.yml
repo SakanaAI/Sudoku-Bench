@@ -1,0 +1,12 @@
+services:
+  app:
+    build: .
+    image: sudokupad-interaction
+    command: ["python", "app.py"]
+    volumes:
+      - ./app.py:/home/user/app.py:ro
+    working_dir: /home/user
+    platform: linux/x86_64
+    ports:
+      - "8000:8000"
+    tty: true

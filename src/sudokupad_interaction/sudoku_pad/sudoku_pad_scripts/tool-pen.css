@@ -1,0 +1,96 @@
+
+:root {
+	/* Group: Pen Colors */
+		--puzzle-pencolor-1: rgb(31, 128, 32);
+		--puzzle-pencolor-2: rgb(232, 124, 241);
+		--puzzle-pencolor-3: rgb(228, 150, 50);
+		--puzzle-pencolor-4: rgb(245, 58, 55);
+		--puzzle-pencolor-5: rgb(210, 190, 50);
+		--puzzle-pencolor-6: rgb(61, 153, 245);
+		--puzzle-pencolor-7: rgb(214, 214, 214);
+		--puzzle-pencolor-8: rgb(124, 124, 124);
+		--puzzle-pencolor-9: rgb(-36, -36, -36);
+}
+
+.tool-pen button.digit {
+	position: relative;
+	text-indent: -999em;
+	overflow: hidden;
+}
+
+.tool-pen button.digit:not(.current) {
+	position: relative;
+	color: transparent;
+	background-color: var(--body-bg);
+}
+.tool-pen button.current {
+}
+.tool-pen button.digit:after {
+	content: "";
+	position: absolute;
+	width: 60%; height: 60%;
+	left: 20%; top: 20%;
+}
+
+.tool-pen button[data-key="1"]:after { background-color: var(--puzzle-pencolor-1); }
+.tool-pen button[data-key="2"]:after { background-color: var(--puzzle-pencolor-2); }
+.tool-pen button[data-key="3"]:after { background-color: var(--puzzle-pencolor-3); }
+.tool-pen button[data-key="4"]:after { background-color: var(--puzzle-pencolor-4); }
+.tool-pen button[data-key="5"]:after { background-color: var(--puzzle-pencolor-5); }
+.tool-pen button[data-key="6"]:after { background-color: var(--puzzle-pencolor-6); }
+.tool-pen button[data-key="7"]:after { background-color: var(--puzzle-pencolor-7); }
+.tool-pen button[data-key="8"]:after { background-color: var(--puzzle-pencolor-8); }
+.tool-pen button[data-key="9"]:after { background-color: var(--puzzle-pencolor-9); }
+
+.tool-pen button[data-control="delete"],
+.tool-pen button[data-key="0"]
+{ opacity: 0; }
+
+.tool-pen .controls-input { position: relative; }
+
+.cell-pen {
+	fill: none;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 5;
+	opacity: 0.8;
+}
+.pen-3, .pen-4, .pen-b, .pen-c {
+	stroke-width: 2.5;
+}
+.penhint {
+	fill: none;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 16;
+	opacity: 0.6;
+}
+.pencolor-erase {
+	stroke: rgba(230, 38, 31, 0.8);
+	opacity: 0.5;
+}
+
+.pencolor-1 { stroke: var(--puzzle-pencolor-1); }
+.pencolor-2 { stroke: var(--puzzle-pencolor-2); }
+.pencolor-3 { stroke: var(--puzzle-pencolor-3); }
+.pencolor-4 { stroke: var(--puzzle-pencolor-4); }
+.pencolor-5 { stroke: var(--puzzle-pencolor-5); }
+.pencolor-6 { stroke: var(--puzzle-pencolor-6); }
+.pencolor-7 { stroke: var(--puzzle-pencolor-7); }
+.pencolor-8 { stroke: var(--puzzle-pencolor-8); }
+.pencolor-9 { stroke: var(--puzzle-pencolor-9); }
+
+.penlinemode {
+	position: absolute;
+	left: 0; right: 0;
+	top: 13rem; height: 4rem;
+	border: 1px solid #ccc;
+	border-radius: 0.5rem;
+}
+.penlinemode select {
+	position: absolute;
+	left: 0.8rem; right: 0.8rem;
+	top: 0.8rem; bottom: 0.8rem;
+	font-size: 1.2rem;
+	border-radius: 0.5rem;
+}

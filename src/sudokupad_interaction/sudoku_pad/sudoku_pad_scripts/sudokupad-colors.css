@@ -1,0 +1,166 @@
+
+/* Lightmode theme */
+
+:root {
+	--color-white: #fff;
+	--color-black: #000;
+	--body-bg: #fff;
+
+	--puzzle-selectioncage: rgba(0, 126, 255, 0.7);
+	--puzzle-given: #000;
+	--puzzle-givenCornermark: #000;
+	--puzzle-givenCandidate: #000;
+	--puzzle-givenoutlines: var(--body-bg);
+	--puzzle-value: rgb(29,106,229);
+	--puzzle-candidate: #1d6ae5;
+	--puzzle-pencilmark: #1d6ae5;
+	--puzzle-digitoutlines: rgba(255,255,255,0.7);
+	
+	--puzzle-cellerror: rgba(179, 58, 58, 0.5);
+	--puzzle-pencilmarkerror: rgba(179, 58, 58, 1);
+
+	--button-bg: #fff;
+	--controls-button-text: #fff;
+	--controls-button-bg: #6a1b9a;
+	--controls-button-hover-text: #fff;
+	--controls-button-hover-bg: #7b1fa2;
+	--controls-button-selected-text: #fff;
+	--controls-button-selected-bg: #6a1b9a;
+	--controls-button-selected-hover-text: #fff;
+	--controls-button-selected-hover-bg: #7b1fa2;
+	--controls-button-selectedperm-text: #fff;
+	--controls-button-selectedperm-bg: #6a1b9a;
+	--controls-button-selectedperm-hover-text: #fff;
+	--controls-button-selectedperm-hover-bg: #7b1fa2;
+	
+	--text-stroke-width: 0;
+	--outlinefilter: url("#outlinefilter");
+}
+
+/* Darkmode theme */
+.setting-darkmode {
+	--dm-black: #1a1a1a;
+	--dm-white: #eee;
+	--dm-black-alpha: rgba(18,18,18,0.7);
+	--dm-userblue: #5f95ec;
+	--dm-rulesbg: #265016;
+	--dm-button-color: #8522c3;
+	--dm-button-border: #eee;
+	--dm-button-bg: #242424;
+	--dm-button-hover: #333;
+	--dm-button-dark: #6a1b9a;
+	--dm-button-dark-hover: #9f3cdd;
+	
+	--color-white: var(--dm-black);
+	--color-black: var(--dm-white);
+	--body-bg: var(--dm-black);
+	--puzzle-pencilmark: #5f95ec;
+
+	--button-color: #8522c3;
+	--button-bg: var(--dm-button-bg);
+	--controls-button-text: var(--dm-white);
+	--controls-button-bg: var(--dm-button-dark);
+	--controls-button-hover-bg: var(--dm-button-dark-hover);
+	--puzzle-given: var(--dm-white);
+	--puzzle-givenCornermark: var(--body-bg);
+	--puzzle-givenCandidate: var(--body-bg);
+	--puzzle-givenoutlines: var(--body-bg);
+	
+	--puzzle-value: #5f95ec;
+	--puzzle-candidate: #5f95ec;
+	--puzzle-pencilmark: #5f95ec;
+	--puzzle-digitoutlines: rgba(26,26,26,0.7);
+	
+	--outlinefilter: url("#outlinefilter_dark");
+}
+
+/* Setting: digitoutlines */
+.setting-digitoutlines {
+	--text-stroke-width: 2px;
+}
+
+#svgrenderer text {
+	fill: var(--color-black);
+	stroke: var(--puzzle-digitoutlines);
+}
+
+.setting-darkmode rect.feature-kropki[fill="#000" i],
+.setting-darkmode rect.feature-kropki[fill="#000000" i]
+	{ stroke: var(--dm-white); fill: var(--dm-black); }
+.setting-darkmode text.feature-kropki[fill="#000" i],
+.setting-darkmode text.feature-kropki[fill="#000000" i]
+	{ fill: var(--dm-black); }
+.setting-darkmode rect.feature-kropki[fill="#fff" i],
+.setting-darkmode rect.feature-kropki[fill="#ffffff" i]
+	{ stroke: var(--dm-black); fill: var(--dm-white); }
+.setting-darkmode text.feature-kropki[fill="#fff" i],
+.setting-darkmode text.feature-kropki[fill="#ffffff" i]
+	{ fill: var(--dm-white); }
+
+.setting-darkmode .dialog { color: var(--dm-white); background-color: var(--dm-black); }
+.setting-darkmode #controls { color: var(--dm-white); }
+.setting-darkmode .puzzle-rules { background-color: var(--dm-rulesbg); }
+.setting-darkmode .dialog .setting-item label { color: var(--dm-button-color); }
+.setting-darkmode .setting-toggle:after { background: var(--dm-button-color); }
+
+/* Group: Puzzle Chrome */
+	#svgrenderer .cell-given {
+		color: var(--puzzle-given);
+		fill: var(--puzzle-given);
+	}
+	#svgrenderer .cell-value {
+		color: var(--puzzle-value);
+		fill: var(--puzzle-value);
+	}
+	#svgrenderer .cell-candidate {
+		color: var(--puzzle-candidate);
+		fill: var(--puzzle-candidate);
+	}
+	#svgrenderer .cell-pencilmark { 
+		color: var(--puzzle-pencilmark);
+		fill: var(--puzzle-pencilmark);
+	}
+	#svgrenderer .cell-pencilmark.givenCornermark {
+		color: var(--puzzle-givenCornermark);
+		fill: var(--puzzle-givenCornermark);
+	}
+	#svgrenderer .cell-candidate .given {
+		color: var(--puzzle-givenCandidate);
+		fill: var(--puzzle-givenCandidate);
+	}
+	#svgrenderer .cage-selectioncage {
+		stroke: var(--puzzle-selectioncage);
+	}
+	#svgrenderer rect.cage-label {
+		fill: var(--body-bg);
+	}
+	#svgrenderer text.cage-label {
+		color: var(--puzzle-given);
+		fill: var(--puzzle-given);
+	}
+	
+/* Group: Board UI */
+	.controls-input button {
+		color: var(--controls-button-text);
+		background-color: var(--controls-button-bg);
+	}
+	.controls-input button:hover {
+		color: var(--controls-button-hover-text);
+		background-color: var(--controls-button-hover-bg);
+	}
+	#controls button.selected {
+		color: var(--controls-button-selected-text);
+		background-color: var(--controls-button-selected-bg);
+	}
+	#controls button.selectedperm {
+		color: var(--controls-button-selectedperm-text);
+		background-color: var(--controls-button-selectedperm-bg);
+	}
+	#controls button.selected:hover {
+		color: var(--controls-button-selected-hover-text);
+		background-color: var(--controls-button-selected-hover-bg);
+	}
+	#controls button.selectedperm:hover {
+		color: var(--controls-button-selectedperm-bg);
+		background-color: var(--controls-button-selectedperm-hover-bg);
+	}

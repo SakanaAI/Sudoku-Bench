@@ -1,0 +1,30 @@
+
+button[data-control="toggleletter"] { padding: .4rem; }
+.input-digit  button[data-control="toggleletter"]::before { content: "9";  font-size: 1.7rem; }
+.input-digit  button[data-control="toggleletter"]::after  { content: "/A"; font-size: 1rem; }
+.input-letter button[data-control="toggleletter"]::before { content: "9/"; font-size: 1rem; }
+.input-letter button[data-control="toggleletter"]::after  { content: "A";  font-size: 1.7rem; }
+.setting-toolletter .tool-normal .controls-input button[data-control="delete"],
+.setting-toolletter .tool-corner .controls-input button[data-control="delete"],
+.setting-toolletter .tool-centre .controls-input button[data-control="delete"]
+{
+	flex: 0 0 4rem;
+	width: 4rem;
+}
+.setting-toolletter .tool-normal .controls-input button[data-control="delete"] svg,
+.setting-toolletter .tool-corner .controls-input button[data-control="delete"] svg,
+.setting-toolletter .tool-centre .controls-input button[data-control="delete"] svg
+{ transform: scale(0.8); }
+#cell-givens, #cell-values, #cell-candidates, #cell-pencilmarks {
+	text-transform: uppercase;
+}
+
+.tool-corner button[data-value="A"] { align-items: flex-start; justify-content: flex-start; }
+.tool-corner button[data-value="B"] { align-items: flex-start; justify-content: center; }
+.tool-corner button[data-value="C"] { align-items: flex-start; justify-content: flex-end; }
+.tool-corner button[data-value="D"] { align-items: center; justify-content: flex-start; }
+.tool-corner button[data-value="E"] { align-items: center; justify-content: center; }
+.tool-corner button[data-value="F"] { align-items: center; justify-content: flex-end; }
+.tool-corner button[data-value="G"] { align-items: flex-end; justify-content: flex-start; }
+.tool-corner button[data-value="H"] { align-items: flex-end; justify-content: center; }
+.tool-corner button[data-value="I"] { align-items: flex-end; justify-content: flex-end; }

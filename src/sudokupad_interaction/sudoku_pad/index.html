@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<!-- saved from url=(0029)https://dev.sudokupad.app/scf -->
+<html lang="en" style="--cell-color-0: transparent; --cell-color-1: rgb(214, 214, 214); --cell-color-2: rgb(124, 124, 124); --cell-color-3: rgb(-36, -36, -36); --cell-color-4: rgb(179, 229, 106); --cell-color-5: rgb(232, 124, 241); --cell-color-6: rgb(228, 150, 50); --cell-color-7: rgb(245, 58, 55); --cell-color-8: rgb(252, 235, 63); --cell-color-9: rgb(61, 153, 245); --cell-color-a: transparent; --cell-color-b: rgb(204, 51, 17); --cell-color-c: rgb(17, 119, 51); --cell-color-d: rgb(0, 68, 196); --cell-color-e: rgb(238, 153, 170); --cell-color-f: rgb(255, 255, 25); --cell-color-g: rgb(240, 70, 240); --cell-color-h: rgb(160, 90, 30); --cell-color-i: rgb(51, 187, 238); --cell-color-j: rgb(145, 30, 180); --cell-color-k: transparent; --cell-color-l: rgb(245, 58, 55); --cell-color-m: rgb(76, 175, 80); --cell-color-n: rgb(61, 153, 245); --cell-color-o: rgb(249, 136, 134); --cell-color-p: rgb(149, 208, 151); --cell-color-q: rgb(158, 204, 250); --cell-color-r: rgb(170, 12, 9); --cell-color-s: rgb(47, 106, 49); --cell-color-t: rgb(9, 89, 170);"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+		<title>Classic Sudoku by SCF import (Sven's SudokuPad v0.589.0)</title>
+		<meta name="author" content="Sven Neumann, sven@svencodes.com">
+		<meta name="copyright" content="Sven Neumann, sven@svencodes.com">
+		<meta name="viewport" content="width=device-width,height=device-height,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no, minimal-ui">
+		<meta name="HandheldFriendly" content="true">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+		<meta name="norton-safeweb-site-verification" content="0mw8o5jz2qb45b9mszz1wr107nbovrwe4c14uw1p61ypqvibs0r0xss0wcmxi98yub-xr2hop0615kow4fjbepme8400w6627jpgkvy5btwbb4q85ita-6f02tlf5e-a">
+		<meta name="format-detection" content="telephone=no">
+		<meta name="chrome" content="nointentdetection">
+		<link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="./images/favicon-16x16.png">
+		<style>
+			body { background-color: #121212; } /* Avoid flash-of-white */
+		</style>
+		<!--BUNDLE[/sudokupad.bundle.css]-->
+		<link rel="stylesheet" href="./sudoku_pad_scripts/style.css">
+		<link rel="stylesheet" href="./sudoku_pad_scripts/sudokupad-colors.css">
+		<!--/BUNDLE[/sudokupad.bundle.css]-->
+		<script>
+			if(document.location.hostname === 'app.crackingthecryptic.com') {
+				let script = Object.assign(document.createElement('script'), {id: 'Cookiebot', type: 'text/javascript', src: 'https://consent.cookiebot.com/uc.js'});
+				Object.assign(script.dataset, {'cbid': 'cd82f36e-750f-4ecd-aa4f-58712fc543bc', 'blockingmode': 'auto'});
+				document.querySelector('head').appendChild(script);
+			}
+			// Work around mobile scaling issues
+			// initial-scale = 1 / devicePixelRatio
+			document.querySelector('meta[name="viewport"]').getAttribute('content').replace(/initial-scale=([^,]+)/, 'initial-scale='+(1 / window.devicePixelRatio).toFixed(4));
+		</script>
+		<link rel="preconnect" href="https://fonts.googleapis.com/">
+		<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
+		<script name="www-roboto" nonce="Lp7j_riowsdovYBucQ_EbQ">
+			if (document.fonts && document.fonts.load) {
+				document.fonts.load('400 16px Roboto', '');
+				document.fonts.load('500 16px Roboto', '');
+				document.fonts.load('400 24px Lobster', '');
+			}
+		</script>
+
+	<style>
+		.solveddigits-0 { opacity: 1; }
+		.solveddigits-1 { opacity: 1; }
+		.solveddigits-2 { opacity: 1; }
+		.solveddigits-3 { opacity: 0.9; }
+		.solveddigits-4 { opacity: 0.9; }
+		.solveddigits-5 { opacity: 0.8; }
+		.solveddigits-6 { opacity: 0.7; }
+		.solveddigits-7 { opacity: 0.6; }
+		.solveddigits-8 { opacity: 0.5; }
+		.solveddigits-9 { opacity: 0.3; }
+
+		.setting-marksolveddigits-on .solveddigits-0 { opacity: 1; }
+		.setting-marksolveddigits-on .solveddigits-1 { opacity: 1; }
+		.setting-marksolveddigits-on .solveddigits-2 { opacity: 1; }
+		.setting-marksolveddigits-on .solveddigits-3 { opacity: 1; }
+		.setting-marksolveddigits-on .solveddigits-4 { opacity: 1; }
+		.setting-marksolveddigits-on .solveddigits-5 { opacity: 1; }
+		.setting-marksolveddigits-on .solveddigits-6 { opacity: 1; }
+		.setting-marksolveddigits-on .solveddigits-7 { opacity: 1; }
+		.setting-marksolveddigits-on .solveddigits-8 { opacity: 1; }
+		.setting-marksolveddigits-on .solveddigits-9 { opacity: 0.3; }
+
+		.setting-marksolveddigits-count .solveddigit:after {
+			display: block;
+			position: absolute;
+			bottom: 0.25rem; right: 0.25rem;
+			font-size: 0.8rem;
+			line-height: 1rem;
+		}
+		.setting-marksolveddigits-count .solveddigits-0:after { content: ""; }
+		.setting-marksolveddigits-count .solveddigits-1:after { content: "1"; }
+		.setting-marksolveddigits-count .solveddigits-2:after { content: "2"; }
+		.setting-marksolveddigits-count .solveddigits-3:after { content: "3"; }
+		.setting-marksolveddigits-count .solveddigits-4:after { content: "4"; }
+		.setting-marksolveddigits-count .solveddigits-5:after { content: "5"; }
+		.setting-marksolveddigits-count .solveddigits-6:after { content: "6"; }
+		.setting-marksolveddigits-count .solveddigits-7:after { content: "7"; }
+		.setting-marksolveddigits-count .solveddigits-8:after { content: "8"; }
+		.setting-marksolveddigits-count .solveddigits-9:after { content: "9"; }
+		</style><style>
+		.cage-seencells {
+			fill: rgb(255, 215, 0);
+			/*fill: var(--puzzle-selectioncage);*/
+			opacity: 0.2;
+		}
+	</style><style>
+			#svgrenderer .rowcollabel { font-size: 0.9rem; }
+			#svgrenderer .rowlabel { text-anchor: end; }
+		</style><style>
+			.setting-uitheme-monolight {
+				--main-color: #333;
+				--controls-button-bg: var(--main-color);
+				--controls-button-hover-bg: var(--main-color);
+				--inv-color: #eee;
+				--bg-color: #eee;
+				--dm-button-dark: var(--main-color);
+			}
+			.setting-uitheme-purple {
+				--main-color: #6a1b9a;
+				--controls-button-bg: var(--main-color);
+				--controls-button-hover-bg: var(--main-color);
+				--inv-color: #fff;
+				--bg-color: #eee;
+				--dm-button-dark: var(--main-color);
+			}
+			.setting-uitheme-orange {
+				--main-color: #d55e00;
+				--controls-button-bg: var(--main-color);
+				--controls-button-hover-bg: var(--main-color);
+				--inv-color: #fff;
+				--bg-color: #eee;
+				--dm-button-dark: var(--main-color);
+			}
+			.setting-uitheme-red {
+				--main-color: #d41159;
+				--controls-button-bg: var(--main-color);
+				--controls-button-hover-bg: var(--main-color);
+				--inv-color: #fff;
+				--bg-color: #eee;
+				--dm-button-dark: var(--main-color);
+			}
+			.setting-uitheme-green {
+				--main-color: #006400;
+				--controls-button-bg: var(--main-color);
+				--controls-button-hover-bg: var(--main-color);
+				--inv-color: #fff;
+				--bg-color: #eee;
+				--dm-button-dark: var(--main-color);
+			}
+			.setting-uitheme-blue {
+				--main-color: #0172b2;
+				--controls-button-bg: var(--main-color);
+				--controls-button-hover-bg: var(--main-color);
+				--inv-color: #fff;
+				--bg-color: #eee;
+				--dm-button-dark: var(--main-color);
+			}
+			.setting-uitheme-brown {
+				--main-color: #bc6c25;
+				--controls-button-bg: var(--main-color);
+				--controls-button-hover-bg: var(--main-color);
+				--inv-color: #fff;
+				--bg-color: #eee;
+				--dm-button-dark: var(--main-color);
+			}
+			button, button:hover, .button, .button:hover {
+				position: relative;
+				background: var(--bg-color);
+			}
+			button:hover, .button:hover { overflow: visible !important; }
+			/*
+			button:hover:after, .button:hover:after {
+				display: block;
+				position: absolute;
+				left: -1px; top: -1px;
+				width: calc(100% + 2px); height: calc(100% + 2px);
+				content: "";
+				background: var(--main-color);
+				opacity: 0.1;
+			}
+			*/
+			.page-menu .selected,
+			.foot-menu,
+			.topbar,
+			.controls-input button, .controls-input button:hover,
+			#controls button.selected, #controls button:hover.selected,
+			#controls button.selectedperm, #controls button:hover.selectedperm
+				{ background: var(--main-color); }
+			.controls-input button:hover,
+			#controls button:hover.selected,
+			#controls button:hover.selectedperm
+				{ filter: brightness(1.25); }
+			.controls-input button:hover:before,
+			#controls button:hover.selected:before,
+			#controls button:hover.selectedperm:before
+				{ filter: brightness(0.8); }
+			.setting-item label,
+			.page-menu a,
+			.puzzlemenu a,
+			.puzzlemenu svg,
+			button, label.button
+				{ color: var(--main-color); }
+			.dialog button.dialog-primary {
+				background: var(--main-color);
+				color: var(--inv-color);
+			}
+			.setting-group > label {
+				background-color: var(--main-color);
+			}
+		</style><style>
+		.cell-error {
+			background-color: var(--puzzle-cellerror);
+			fill: var(--puzzle-cellerror);
+		}
+		.setting-checkpencilmarks #cell-pencilmarks .conflict,
+		.setting-checkpencilmarks #cell-candidates .conflict {
+			fill: var(--puzzle-pencilmarkerror);
+		}
+	</style><style>
+		img.emojireplacement {
+			height: 1em; width: 1em; margin: 0 .05em 0 .1em; vertical-align: -0.1em;
+		}
+		image.twemoji {
+			transform-box: fill-box;
+			transform-origin: center;
+		}
+	</style><style>
+		:root {
+			--fog-mask-white: #fff;
+			--fog-mask-black: #000;
+		}
+		.fog-mask-white { fill: var(--fog-mask-white); }
+		.fog-mask-black { fill: var(--fog-mask-black); }
+		#fog-edge * {
+			fill: var(--fog-mask-black);
+			stroke-linecap: butt;
+			stroke-linejoin: round;
+		}
+		#fog-fogcover { fill: #afafaf; }
+		.setting-darkmode #fog-fogcover { fill: #4d4d4d; }
+	</style><style>
+		.setting-outlinetest-outlinetestnone #arrows { filter: none; }
+		.setting-outlinetest-outlinetesta #arrows { filter: url("#outlinetesta"); }
+		.setting-outlinetest-outlinetesta #arrows { filter: url("#outlinetesta"); }
+		.setting-outlinetest-outlinetestb #arrows { filter: url("#outlinetestb"); }
+		.setting-outlinetest-outlinetestc #arrows { filter: url("#outlinetestc"); }
+		.setting-outlinetest-outlinetestd #arrows { filter: url("#outlinetestd"); }
+		.setting-outlinetest-outlineteste #arrows { filter: url("#outlineteste"); }
+		.setting-outlinetest-outlinetestf #arrows { filter: url("#outlinetestf"); }
+		.setting-outlinetest-outlinetestg #arrows { filter: url("#outlinetestg"); }
+	</style><style>
+		#controls .rulealert {
+			position: absolute;
+			margin-top: -1.6rem;
+			line-height: 1.6rem;
+			font-weight: bold;
+			font-size: 1.0rem;
+		}
+	</style><style>
+		.replayfiledrop .dialog {
+			border-color: red;
+		}
+	</style><style>
+		.season-helloween2023 #svenpeek {
+			background-image: url(/images/svenpeek_helloween.png);
+		}
+		#sudokuconstream {
+			display: none;
+			text-align: center;
+			margin: 1rem 2rem;
+			padding: 0.5rem;
+			line-height: 1.7rem;
+			border: 0.5rem solid rgba(255, 40, 40, 0.5);
+			border-radius: 1rem;
+			text-decoration: 1px underline solid;
+			background:
+				no-repeat url(/images/sudokucon-profile-70x70.png) 0.5rem center,
+				no-repeat url(/images/sudokucon-profile-70x70.png) right 0.5rem center
+			;
+			background-size: 2.5rem 2.5rem;
+		}
+		#sudokuconstream:hover { text-decoration: auto underline solid; }
+		#sudokuconstream .flip { display: inline-block; transform: scale(-1, 1); }
+		#sudokuconstream span { display: block; }
+		#sudokuconstream .line1 {
+			font-weight: 400;
+			font-size: 1.6rem;
+			line-height: 2.5rem;
+		}
+		.season-sudokuconstream .supportlinks { display: none; }
+		.season-sudokuconstream #sudokuconstream { display: block; }
+		.setting-hidesupportlinks #sudokuconstream { display: none; }
+		#sudokuconsurvey {
+			display: none;
+			text-align: center;
+			padding: 0.6rem;
+			margin: 0.5rem auto;
+			max-width: 18rem;
+			font-size: 1rem;
+			line-height: 1.4rem;
+			border-radius: 1rem;
+			text-decoration: 1px underline solid;
+			background:
+				no-repeat url(/images/sudokucon_logo_sm.png) left 0.5rem center,
+				no-repeat url(/images/sudokucon_logo_sm.png) right 0.5rem center
+			;
+			background-color: rgba(255, 40, 40, 0.1);
+			background-size: 2.5rem 2.5rem;
+		}
+		#sudokuconsurvey span { display: block; }
+		#sudokuconsurvey .line2 { font-size: smaller; }
+		.season-sudokuconsurvey #sudokuconsurvey { display: block; }
+		.setting-hidesupportlinks #sudokuconsurvey { display: none; }
+	</style><style>
+	</style><style>
+		.game > .supportlinks {
+			position: absolute;
+			top: 40px;
+		}
+		.game > .supportlinks .prefix { display: none; }
+		.supportlinks.type1 {
+			font-size: 1.5rem;
+			line-height: 2rem;
+			text-align: center;
+			padding-bottom: 0.5rem;
+		}
+		.supportlinks.type2 {
+			font-size: 1.5rem;
+			line-height: 2rem;
+			text-align: center;
+			padding-bottom: 0.5rem;
+		}
+		.dialog .supportlinks { font-size: 1.3rem; }
+	</style><style>
+		.screenshot-dialog .setting-item {
+			margin: 0.25rem 0;
+			height: 1.2rem;
+		}
+		.screenshot-dialog .setting-item label {
+			color: var(--color-black);
+			font-weight: inherit;
+			font-size: inherit;
+			margin: 0;
+			float: left;
+		}
+		.screenshot-dialog input.setting-toggle {
+			position: relative;
+			margin-left: 1rem;
+		}
+		.screenshot-dialog input.setting-toggle::after {
+			background-color: var(--color-black);
+			position: relative;
+			float: right;
+		}
+		.screenshot-dialog .dialog-options {
+			flex-direction: row;
+			flex-wrap: wrap;
+			margin: 0 1rem;
+		}
+		.screenshot-dialog .dialog-options button {
+			flex: 1 0 35%;
+			min-width: auto;
+		}
+	</style><style>
+		.packpuzzle {
+			display: block;
+			line-height: 3rem;
+			margin: 0 1rem;
+			padding: 0.1rem;
+		}
+		.packpuzzle.current {
+			/*background: #eeee;*/
+		}
+		/*
+		.packpuzzle img {
+			float: left;
+			height: 2.8rem;
+		}
+		*/
+		.overlay-padpack {
+			background-color: var(--body-bg);
+			animation: none;
+		}
+		.overlay-padpack .dialog {
+			width: 100%;
+			border: none;
+		}
+		.packsegment {
+			margin: 0 2rem;
+			border-bottom: 1px solid #aaa;
+			max-width: 40rem;
+			margin: 0 auto;
+		}
+		.packsegment .packpuzzle { display: block; margin: 0 auto; }
+		.packsegment .packpuzzle img { display: block; width: 100%; height: 100%; }
+	</style><style>
+		.layout-controlsflipped .controls-buttons > div {
+			flex-direction: row-reverse;
+		}
+	</style><style>
+		.gridrules {
+			margin: 1rem 0;
+		}
+		.gridrules .titleandauthor {
+			margin: 0 0 0.5rem 0;
+			font-size: 110%;
+		}
+		.gridrules .titleandauthor .title, .gridrules .titleandauthor .author {
+			font-weight: bold;
+		}
+	</style><style>
+		.fabcan {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+		}
+	</style><style>
+		.endlessdialog {
+			/*
+			border: none;
+			border-radius: 0;
+			width: 100%; height: 100%;*/
+		}
+		.endlesspuzzle {
+			position: relative;
+		}
+		.endlessdialog .endless-btn-skip {
+			position: absolute;
+			top: 0;
+			right: 0;
+			width: 20px; height: 20px;
+			line-height: 20px;
+			padding: 0; margin: 4px;
+			font-size: 18px;
+			font-weight: 800;
+			border-radius: 4px;
+			opacity: 0.8;
+		}
+	</style><style>
+		.choosepuzzlefont .fontrow {
+			display: flex;
+			gap: 0.6rem;
+			margin: 0 0.3rem;
+		}
+		.fontchoice {
+			display: inline-block;
+			padding: 0.2rem;
+			width: calc(33% - 0.4rem);
+		}
+		.fontchoice img {
+			display: block;
+			width: 100%;
+			height: 100%;
+		}
+		.choosepuzzlefont .fontchoice.selected {
+			outline: 4px solid blue;
+		}
+
+			.puzzlefont-baublemonogram .board #svgrenderer .cell-given,
+			.puzzlefont-baublemonogram .board #svgrenderer .cell-value {
+				font-family: puzzlefont-baublemonogram;
+				transform: translate(0px, -10px);
+				font-size: 58px;
+			}
+
+
+			.puzzlefont-bonnet .board #svgrenderer .cell-given,
+			.puzzlefont-bonnet .board #svgrenderer .cell-value {
+				font-family: puzzlefont-bonnet;
+				transform: translate(0px, 5px);
+				font-size: 58px;
+			}
+
+
+			.puzzlefont-cartoonblocks .board #svgrenderer .cell-given,
+			.puzzlefont-cartoonblocks .board #svgrenderer .cell-value {
+				font-family: puzzlefont-cartoonblocks;
+				transform: translate(0px, 0px);
+				font-size: 62px;
+			}
+
+
+			.puzzlefont-dickensianchristmas .board #svgrenderer .cell-given,
+			.puzzlefont-dickensianchristmas .board #svgrenderer .cell-value {
+				font-family: puzzlefont-dickensianchristmas;
+				transform: translate(0px, -3px);
+				font-size: 48px;
+			}
+
+
+			.puzzlefont-firstsnow .board #svgrenderer .cell-given,
+			.puzzlefont-firstsnow .board #svgrenderer .cell-value {
+				font-family: puzzlefont-firstsnow;
+				transform: translate(0px, 0px);
+				font-size: 72px;
+			}
+
+
+			.puzzlefont-christmastinsel .board #svgrenderer .cell-given,
+			.puzzlefont-christmastinsel .board #svgrenderer .cell-value {
+				font-family: puzzlefont-christmastinsel;
+				transform: translate(0px, -5px);
+				font-size: 60px;
+			}
+
+
+			.puzzlefont-christmasfont .board #svgrenderer .cell-given,
+			.puzzlefont-christmasfont .board #svgrenderer .cell-value {
+				font-family: puzzlefont-christmasfont;
+				transform: translate(0px, -5px);
+				font-size: 48px;
+			}
+
+
+			.puzzlefont-happychristmas .board #svgrenderer .cell-given,
+			.puzzlefont-happychristmas .board #svgrenderer .cell-value {
+				font-family: puzzlefont-happychristmas;
+				transform: translate(0px, -5px);
+				font-size: 53px;
+			}
+
+
+			.puzzlefont-rudolph .board #svgrenderer .cell-given,
+			.puzzlefont-rudolph .board #svgrenderer .cell-value {
+				font-family: puzzlefont-rudolph;
+				transform: translate(0px, 0px);
+				font-size: 58px;
+			}
+
+
+			.puzzlefont-snowballs .board #svgrenderer .cell-given,
+			.puzzlefont-snowballs .board #svgrenderer .cell-value {
+				font-family: puzzlefont-snowballs;
+				transform: translate(0px, -5px);
+				font-size: 67px;
+			}
+
+
+			.puzzlefont-stnichols .board #svgrenderer .cell-given,
+			.puzzlefont-stnichols .board #svgrenderer .cell-value {
+				font-family: puzzlefont-stnichols;
+				transform: translate(0px, 5px);
+				font-size: 53px;
+			}
+
+
+			.puzzlefont-xtree .board #svgrenderer .cell-given,
+			.puzzlefont-xtree .board #svgrenderer .cell-value {
+				font-family: puzzlefont-xtree;
+				transform: translate(0px, 10px);
+				font-size: 58px;
+			}
+
+
+			.puzzlefont-sevensegment .board #svgrenderer .cell-given,
+			.puzzlefont-sevensegment .board #svgrenderer .cell-value {
+				font-family: puzzlefont-sevensegment;
+				transform: translate(0px, 5px);
+				font-size: 53px;
+			}
+
+	</style><style>
+		.topbar { z-index: 1; }
+	</style><style>
+		.cloneview-pointer {
+			display: flex;
+			position: absolute;
+			white-space: nowrap;
+			left: 0; top: 0;
+			width: 2rem; height: 2rem; line-height: 2rem;
+			margin: -1rem 0 0 -1rem;
+			justify-content: center;
+			font-size: 0.7rem;
+			border-radius: 1rem;
+			border: 2px solid magenta;
+			color: magenta;
+			transition: transform 0.05s ease-out;
+		}
+		#puzzleselector a {
+			display: block;
+			padding: 0 1rem;
+			line-height: 2rem;
+		}
+		@keyframes markerbounce {
+			  0% { transform: scale(1.0); opacity: 1; }
+			 33% { transform: scale(1.3); opacity: 1; }
+			 66% { transform: scale(1.0); opacity: 1; }
+			100% { transform: scale(2.0); opacity: 0; }
+		}
+		.cage-cellmarker {
+			opacity: 0;
+			animation: 1.0s ease-in-out 0s 1 markerbounce;
+		}
+
+		.setting-rulesonly .topbar,
+		.setting-rulesonly #board,
+		.setting-rulesonly .controls-buttons,
+		.setting-rulesonly .controls-footer,
+		.setting-rulesonly .puzzle-header,
+		.setting-rulesonly .rules-copy
+		{ display: none !important; }
+		.setting-rulesonly .controls,
+		.setting-rulesonly .controls-info,
+		.setting-rulesonly .puzzle-rules
+		{
+			display: block !important;
+			position: absolute !important;
+			top: 0 !important;
+			left: 0 !important;
+			right: 0 !important;
+			bottom: 0 !important;
+			transform: none !important;
+			max-height: 100% !important;
+			max-width: 100% !important;
+			background: none !important;
+			border: none !important;
+			overflow: hidden !important;
+		}
+		.setting-streameffects .topbar,
+		.setting-streameffects .controls,
+		.setting-streameffects #svenpeek,
+		.setting-streameffects #svgrenderer #background,
+		.setting-streameffects #svgrenderer #underlay,
+		.setting-streameffects #svgrenderer #cell-colors,
+		.setting-streameffects #svgrenderer #arrows,
+		.setting-streameffects #svgrenderer #cages,
+		.setting-streameffects #svgrenderer #cell-grids,
+		.setting-streameffects #svgrenderer #cell-errors,
+		.setting-streameffects #svgrenderer #overlay,
+		.setting-streameffects #svgrenderer #cell-overlay,
+		.setting-streameffects #svgrenderer #cell-givens,
+		.setting-streameffects #svgrenderer #cell-pen,
+		.setting-streameffects #svgrenderer #cell-pencilmarks,
+		.setting-streameffects #svgrenderer #cell-candidates,
+		.setting-streameffects #svgrenderer #cell-values,
+		.setting-streameffects #svgrenderer .cage-seencells,
+		.setting-streameffects #svgrenderer .cage-selectioncage
+		{ opacity: 0 !important; }
+	</style><style>
+			.confetti-container {
+				perspective: 700px;
+				position: absolute;
+				overflow: hidden;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				user-select: none;
+				pointer-events: none;
+				-webkit-transform: translate3d(0, 0, 0);
+				transform: translate3d(0, 0, 0);
+				perspective: 1000;
+				-webkit-perspective: 1000;
+				backface-visibility: hidden;
+				-webkit-backface-visibility: hidden;
+			}
+			.confetti {
+				position: absolute;
+				transform-origin: top left;
+				--confetti-content: "";
+				--confetti-color: blue;
+				--confetti-animation: confetti-slow 2.25s ease-out 1 forwards;
+			}
+			.confetti::before {
+				display: block;
+				height: 100%;
+				aspect-ratio: 1 / 1;
+				transform-origin: center;
+				content: var(--confetti-content);
+				background-color: var(--confetti-color);
+				animation: var(--confetti-animation);
+			}
+			@keyframes confetti-slow {
+				0% { margin-top: 0; transform: translate3d(0, 0, 0) rotateX(0) rotateY(0) scale(1, 1); opacity: 1; }
+				100% { margin-top: 105%; transform: translate3d(0, 0, 0) rotateX(360deg) rotateY(180deg) scale(1.5, 1.5); opacity: 0; }
+			}
+			@keyframes confetti-medium {
+				0% { margin-top: 0; transform: translate3d(0, 0, 0) rotateX(0) rotateY(0) scale(1, 1); opacity: 1; }
+				100% { margin-top: 105%; transform: translate3d(0, 0, 0) rotateX(100deg) rotateY(360deg) scale(1.3, 1.3); opacity: 0; }
+			}
+			@keyframes confetti-fast {
+				0% { margin-top: 0; transform: translate3d(0, 0, 0) rotateX(0) rotateY(0) scale(0.8, 0.8); opacity: 1; }
+				100% { margin-top: 105%; transform: translate3d(0, 0, 0) rotateX(10deg) rotateY(250deg) scale(1.2, 1.2); opacity: 0; }
+			}
+			.confetti--animation-slow::before { animation: confetti-slow 2.25s ease-out 1 forwards; }
+			.confetti--animation-medium::before { animation: confetti-medium 1.75s ease-out 1 forwards; }
+			.confetti--animation-fast::before { animation: confetti-fast 1.25s ease-out 1 forwards; }
+
+			.deetdeetdoot {
+				position: absolute;
+				width: 128px; height: 128px;
+				transform-origin: top left;
+				transform: scale(1.3);
+				--rotatey: -10deg;
+				--transFrom: 0%;
+				--transTo: 50%;
+				--rotatez-deet1: 15deg;
+				--rotatez-deet2: 45deg;
+				--rotatez-doot : 75deg;
+			}
+			.deetdeetdoot * { display: block; position: absolute;  }
+			.deetdeetdoot .keys {
+				font-size: 32px;
+				transform-origin: center center;
+				left: -30%; top: -30%;
+				transform: rotate(-45deg);
+				width: 36px; height: 36px;
+				background: no-repeat url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABIBAMAAACnw650AAAAHlBMVEVHcEwxNz0xNz0xNz0xNz0xNz3h6O0xNz2Um6B+hIpZaSqLAAAABnRSTlMAcO/fYIAX+Cy6AAAAZElEQVRIx2NgVC8nAIoCGNzLCYJCBnPCiooZyokAw15RGhBAOFgZaaOKRhWNKhpVNKqIDEXTQSKVWBkIRSBmGg7GqKJRRYNYURuIlQGlMRkZxDZD1IlprokTVlTCwEKw5VckAADbD2ztv9+oVAAAAABJRU5ErkJggg==);
+				background-size: 36px 36px;
+			}
+			.deetdeetdoot .notes { width: 100%; height: 100%; perspective-origin: 0 0; }
+			.deetdeetdoot .notes * { width: 100%; }
+			.deetdeetdoot .notes div {
+				font-size: 48px;
+				height: 1.5rem; line-height: 1.5rem;
+				margin-top: -0.75rem;
+				left: -30%; top: -30%;
+				perspective: 20px;
+				transform-origin: center left;
+			}
+			.deetdeetdoot .notes .slide { transform-origin: center right; animation: 1.2s ease-out 0s 2 forwards; }
+			.deetdeetdoot .keys { animation: 2.4s ease-out 0s 1 forwards; }
+			.deetdeetdoot .deet1 { transform: rotateZ(var(--rotatez-deet1)); }
+			.deetdeetdoot .deet2 { transform: rotateZ(var(--rotatez-deet2)); }
+			.deetdeetdoot .doot  { transform: rotateZ(var(--rotatez-doot )); }
+			.deetdeetdoot.flipped .flip { transform: scale(-1, -1); }
+			@keyframes deetdeetdoot-keys {
+				  0% { opacity: 1.0; }
+				 95% { opacity: 1.0; }
+				100% { opacity: 0.0; }
+			}
+			@keyframes deetdeetdoot-deet1 {
+					      0% { transform: rotateY(var(--rotatey)) translate(var(--transFrom), 0%); opacity: 0.3; }
+				 20%,  40% { transform: rotateY(var(--rotatey)) translate(var(--transTo), 0%); opacity: 1.0; }
+				 60%, 100% { transform: rotateY(var(--rotatey)) translate(var(--transTo), 0%); opacity: 0.0; }
+			}
+			@keyframes deetdeetdoot-deet2 {
+				  0%,  19% { transform: rotateY(var(--rotatey)) translate(var(--transFrom), 0%); opacity: 0.0; }
+				       20% { transform: rotateY(var(--rotatey)) translate(var(--transFrom), 0%); opacity: 0.3; }
+				 40%,  60% { transform: rotateY(var(--rotatey)) translate(var(--transTo), 0%); opacity: 1.0; }
+				 80%, 100% { transform: rotateY(var(--rotatey)) translate(var(--transTo), 0%); opacity: 0.0; }
+			}
+			@keyframes deetdeetdoot-doot  {
+				  0%,  39% { transform: rotateY(var(--rotatey)) translate(var(--transFrom), 0%); opacity: 0.0; }
+				       40% { transform: rotateY(var(--rotatey)) translate(var(--transFrom), 0%); opacity: 0.3; }
+				 60%,  80% { transform: rotateY(var(--rotatey)) translate(var(--transTo), 0%); opacity: 1.0; }
+				      100% { transform: rotateY(var(--rotatey)) translate(var(--transTo), 0%); opacity: 0.0; }
+			}
+			.deetdeetdoot .keys  { animation-name: deetdeetdoot-keys; }
+			.deetdeetdoot .deet1 .slide { animation-name: deetdeetdoot-deet1; }
+			.deetdeetdoot .deet2 .slide { animation-name: deetdeetdoot-deet2; }
+			.deetdeetdoot .doot  .slide { animation-name: deetdeetdoot-doot; }
+
+			.snowflake::before {
+				mask-image: var(--confetti-maskimage);
+				mask-size: 100% 100%;
+				mask-position: top left;
+			}
+		</style><style></style><script src="./sudoku_pad_scripts/twemoji.min.js" type="text/javascript"></script><style>
+		:root {
+			--fog-mask-white: #fff;
+			--fog-mask-black: #000;
+		}
+		.fog-mask-white { fill: var(--fog-mask-white); }
+		.fog-mask-black { fill: var(--fog-mask-black); }
+		#fog-edge * {
+			fill: var(--fog-mask-black);
+			stroke-linecap: butt;
+			stroke-linejoin: round;
+		}
+		#fog-fogcover { fill: #afafaf; }
+		.setting-darkmode #fog-fogcover { fill: #4d4d4d; }
+	</style></head>
+	<body class="setting-showplayinsudokupad setting-selection-cage setting-multicolour setting-hidesolved setting-autocheck setting-toolletter_mode-altletter setting-marksolveddigits-off setting-puzzleevents-confetti setting-conflictchecker-on setting-checkpencilmarks setting-uitheme-purple setting-cellpaste setting-repeatundodelay setting-repeatundointerval">
+
+		<!--BUNDLE[/puzpatcher.bundle.js]-->
+		<!--
+		<script src="/fpuzzlesdecoder.js?v=0.589.0"></script>
+		<script src="/puzzlezipper.js?v=0.589.0"></script>
+		<script src="/lzipper.js?v=0.589.0"></script>
+		<script src="/puzpatcher.js?v=0.589.0"></script>
+		-->
+		<!--/BUNDLE[/puzpatcher.bundle.js]-->
+		<script src="./sudoku_pad_scripts/puzpatcher.bundle.js"></script>
+
+		<div class="app">
+
+			<div class="topbar">
+				<div class="menu">
+					<button class="appmenu" id="appmenubtn">
+						<div class="icon">
+							<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M4 18h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1zm0-5h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1s.45 1 1 1zM3 7c0 .55.45 1 1 1h16c.55 0 1-.45 1-1s-.45-1-1-1H4c-.55 0-1 .45-1 1z"></path></svg>
+						</div>
+					</button>
+				</div>
+				<div id="sudokupad_toplinks">
+					<script>
+						function getPuzzleId(puzzleId = '') {
+							const rePuzzleId = /^([0-9A-Za-z]+|classic(.*)|.+)$/;
+							var urlQueryPuzzleId = document.location.search.replace(/^\?.*puzzleid=([^&]+).*|.*/, '$1');
+							var urlPathPuzzleId = (document.location.pathname.match(/^\/(?:sudoku\/)?(.+)$/) || [])[1];
+							if(typeof puzzleId === 'string' && puzzleId !== '') {
+								//Reading puzzleId from pre-set variable: puzzleid = <puzzleId>
+							}
+							else if(typeof urlQueryPuzzleId === 'string' && urlQueryPuzzleId !== '') {
+								// Reading puzzleId from url query string: ?puzzleid=<puzzleId>
+								puzzleId = urlQueryPuzzleId;
+							}
+							else if(typeof urlPathPuzzleId === 'string' && urlPathPuzzleId !== '') {
+								// Reading puzzleId from url path: /sudoku/<puzzleId>
+								puzzleId = urlPathPuzzleId;
+							}
+							puzzleId = (puzzleId.match(rePuzzleId) || [])[0];
+							return puzzleId;
+						}
+						const saveDecodeURIComponent = (str, dec) => (dec = decodeURIComponent(str), dec.length < str.length ? dec : str);
+						const reFormat = /^(ctc|scf|fpuz(?:zles)?|classic)/;
+						async function getSudokuPadUrl() {
+							const {saveDecodeURIComponent, cleanPuzzlePackage} = loadFPuzzle;
+							let puzzlePackage = getPuzzleId();
+							if('undefined' !== typeof PuzzleLoader) puzzlePackage = await PuzzleLoader.fetchPuzzle(puzzlePackage);
+							puzzlePackage = patchFpuz(puzzlePackage);
+							puzzlePackage = patchSCLPuzzle(puzzlePackage);
+							puzzlePackage = puzzlePackage.replace(/^sclN4/, 'ctcN4');
+							return `https://sudokupad.svencodes.com/${reFormat.test(puzzlePackage) ? 'puzzle' : 'sudoku'}/${saveDecodeURIComponent(puzzlePackage)}`;
+						}
+						async function openSudokuPad(event) {
+							let url = await getSudokuPadUrl();
+							window.open(url, '_blank');
+							if(event) event.preventDefault();
+							return false;
+						}
+						async function captureSudokuPadLink() {
+							let url = await getSudokuPadUrl();
+							let openUrl = () => document.location = url;
+							let gtagArgs = ['event', 'outbound', 'sudokupad', url, {
+								transport: 'beacon',
+								hitCallback: openUrl,
+								eventCallback: openUrl,
+								hitCallbackFail: openUrl,
+							}];
+							if(typeof ga === 'function') ga('send', ...gtagArgs);
+							else gtag(...gtagArgs);
+							setTimeout(openUrl, 100);
+						}
+					</script>
+					<a id="sudokupad_openwith" href="https://sudokupad.svencodes.com/puzzle/scf" title="Sven&#39;s SudokuPad" target="_blank" onclick="captureSudokuPadLink(); return false;"><span>Play in SudokuPad</span> <img src="./images/sudokupad_square_logo.png"> <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M18 19H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h5c.55 0 1-.45 1-1s-.45-1-1-1H5c-1.11 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6c0-.55-.45-1-1-1s-1 .45-1 1v5c0 .55-.45 1-1 1zM14 4c0 .55.45 1 1 1h2.59l-9.13 9.13c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0L19 6.41V9c0 .55.45 1 1 1s1-.45 1-1V3h-6c-.55 0-1 .45-1 1z"></path></svg></a>
+					<script>
+						(() => {
+							function updateSudokuPadLinks() {
+								document.querySelectorAll('a#sudokupad_openwith')
+									.forEach(async link => {
+										link.href = await getSudokuPadUrl();
+										link.removeAttribute('onclick');
+										link.setAttribute('onclick', `captureSudokuPadLink(); return false;`);
+									});
+							};
+							updateSudokuPadLinks();
+							let waitIntervalId = setInterval(() => {
+								if('undefined' !== typeof PuzzleLoader) {
+									clearInterval(waitIntervalId);
+									updateSudokuPadLinks();
+								}
+							}, 300);
+						})();
+					</script>
+				</div>
+				<div class="game-clock" title="Timer Running"><div class="timer">00:21</div><div class="timer-control"><button class="timer-playpause"><svg class="icon-pause" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24px" height="24px"><path d="M10 16c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1s-1 .45-1 1v6c0 .55.45 1 1 1zm2-14C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm2-4c.55 0 1-.45 1-1V9c0-.55-.45-1-1-1s-1 .45-1 1v6c0 .55.45 1 1 1z"></path></svg><svg class="icon-play" fill="currentColor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24px" height="24px"><path d="M10.8 15.9l4.67-3.5c.27-.2.27-.6 0-.8L10.8 8.1c-.33-.25-.8-.01-.8.4v7c0 .41.47.65.8.4zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"></path></svg></button></div></div>
+			</div>
+
+			<aside class="mdc-drawer" id="appmenu">
+				<div class="mdc-drawer-content">
+					<nav class="mdc-list">
+						<div id="appmenuitems">
+							<a class="mdc-list-item menu-link-home" href="https://dev.sudokupad.app/">
+								<div class="icon"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z"></path></svg></div>
+								<span class="mdc-list-item-text">Home / Help</span>
+							</a>
+							<a class="mdc-list-item menu-link-steam" href="https://store.steampowered.com/app/1706870/Svens_SudokuPad/">
+								<div class="icon"><img src="./images/sudokupad_square_logo.png"></div>
+								<span class="mdc-list-item-text">Sven's SudokuPad (Steam)</span>
+							</a>
+							<a class="mdc-list-item menu-link-patreon" href="https://www.patreon.com/svencodes">
+								<div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 180 180"><path fill="#f96753" d="M109 26a48 48 0 1 0 0 96 48 48 0 0 0 0-96"></path><path fill="#052a49" d="M23 154V26h24v128z"></path></svg></div>
+								<span class="mdc-list-item-text">Sven's Patreon</span>
+							</a>
+							<a class="mdc-list-item menu-link-kofi" href="https://ko-fi.com/svencodes">
+								<div class="icon">
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="5 8 33 24" width="34" height="24"><path d="M30.4 21.9a15.48 15.48 0 0 1-2.2.1v-7.2h1.5a3 3 0 0 1 2.5 1.2 3.57 3.57 0 0 1 .8 2.3 3.35 3.35 0 0 1-2.6 3.6Zm6.2-5a6.55 6.55 0 0 0-2.9-4.5 7.67 7.67 0 0 0-4.4-1.4h-22a1.28 1.28 0 0 0-1.1 1.2v.3s-.1 9.7.1 15a3.29 3.29 0 0 0 3.3 3.1s10.1 0 14.9-.1h.7c2.8-.7 3-3.3 3-4.7 5.5.2 9.4-3.7 8.4-8.9Z" fill="#fff" stroke-width="1.14" stroke-linejoin="round" stroke-linecap="round" stroke="#000"></path><path d="M17 26.4c.3.1.4 0 .4 0s3.5-3.2 5.1-5.1c1.4-1.7 1.5-4.4-.9-5.5S17.2 17 17.2 17a3.94 3.94 0 0 0-5.5-.6l-.1.1c-1.2 1.3-.8 3.5.1 4.7a60.17 60.17 0 0 0 5.1 5Z" fill="#ff5e5b"></path><path d="M17.2 26.5a.37.37 0 0 0 .3-.1s3.5-3.2 5.1-5.1c1.4-1.7 1.5-4.4-.9-5.5S17.3 17 17.3 17a3.94 3.94 0 0 0-5.5-.6l-.1.1c-1.2 1.3-.8 3.5.1 4.7a62.58 62.58 0 0 0 5.2 5.1c0 .2.1.2.2.2Z" fill="#ff5e5b"></path></svg></div>
+								<span class="mdc-list-item-text">Sven's Ko-fi</span>
+							</a>
+							<a class="mdc-list-item menu-link-youtube" href="https://www.youtube.com/SvenCodes/">
+								<div class="icon" style="color:#c00"><svg width="30" height="24" viewBox="0 0 121 85"><path fill="currentColor" d="M119 13c-1-5-6-9-11-10-9-3-47-3-47-3S23 0 13 3C8 4 4 8 3 13 0 23 0 43 0 43s0 19 3 29c1 5 5 9 10 10 10 3 48 3 48 3s38 0 47-2c5-2 10-6 11-11 2-10 2-29 2-29s1-20-2-30z"></path><path fill="#fff" d="M80 43 49 24v37z"></path></svg></div>
+								<span class="mdc-list-item-text">Sven's Youtube</span>
+							</a>
+							<a class="mdc-list-item menu-link-thanks" href="https://svencodes.com/thanks/">
+								<div class="icon"><svg width="24" height="24" viewBox="0 0 24 24"><path d="m16.85 6.85 1.44 1.44-4.88 4.88-3.29-3.29a.996.996 0 0 0-1.41 0l-6 6.01a.996.996 0 1 0 1.41 1.41L9.41 12l3.29 3.29c.39.39 1.02.39 1.41 0l5.59-5.58 1.44 1.44a.5.5 0 0 0 .85-.35V6.5a.48.48 0 0 0-.49-.5h-4.29a.5.5 0 0 0-.36.85z"></path></svg></div>
+								<span class="mdc-list-item-text">Special thanks to my supporters</span>
+							</a>
+						<a class="mdc-list-item menu-link-shorturl" href="https://dev.sudokupad.app/scf#" id="appmenu-shorturl">
+						<div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M17 7h-3c-.55 0-1 .45-1 1s.45 1 1 1h3c1.65 0 3 1.35 3 3s-1.35 3-3 3h-3c-.55 0-1 .45-1 1s.45 1 1 1h3c2.76 0 5-2.24 5-5s-2.24-5-5-5zm-9 5c0 .55.45 1 1 1h6c.55 0 1-.45 1-1s-.45-1-1-1H9c-.55 0-1 .45-1 1zm2 3H7c-1.65 0-3-1.35-3-3s1.35-3 3-3h3c.55 0 1-.45 1-1s-.45-1-1-1H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h3c.55 0 1-.45 1-1s-.45-1-1-1z"></path></svg></div>
+						<span class="mdc-list-item-text">Create Short SudokuPad URL</span>
+					</a><a class="mdc-list-item menu-link-endless" href="https://dev.sudokupad.app/scf#" id="appmenu-endless">
+						<div class="icon"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M220-260q-92 0-156-64T0-480q0-92 64-156t156-64q37 0 71 13t61 37l68 62-60 54-62-56q-16-14-36-22t-42-8q-58 0-99 41t-41 99q0 58 41 99t99 41q22 0 42-8t36-22l310-280q27-24 61-37t71-13q92 0 156 64t64 156q0 92-64 156t-156 64q-37 0-71-13t-61-37l-68-62 60-54 62 56q16 14 36 22t42 8q58 0 99-41t41-99q0-58-41-99t-99-41q-22 0-42 8t-36 22L352-310q-27 24-61 37t-71 13Z"></path></svg></div>
+						<span class="mdc-list-item-text">Endless Puzzles (Demo)</span>
+					</a></div>
+						<div class="footer">
+							<div id="menu-app-version">SudokuPad.app (v0.589.0 ©2020-2023 by <a href="https://svencodes.com/">Sven</a>)</div>
+						</div>
+					</nav>
+				</div>
+			</aside>
+
+			<div class="game">
+
+				<div id="board" class="board" style="display: flex; transform: translate(-50%, -50%) scale(1.47); opacity: 1; left: 471px; top: 511px; width: 608px; height: 608px;">
+					<div class="grid">
+						<div class="cells"><div class="row"><div class="cell" row="0" col="0"></div><div class="cell" row="0" col="1"></div><div class="cell" row="0" col="2"></div><div class="cell" row="0" col="3"></div><div class="cell" row="0" col="4"></div><div class="cell" row="0" col="5"></div><div class="cell" row="0" col="6"></div><div class="cell" row="0" col="7"></div><div class="cell" row="0" col="8"></div></div><div class="row"><div class="cell" row="1" col="0"></div><div class="cell" row="1" col="1"></div><div class="cell" row="1" col="2"></div><div class="cell" row="1" col="3"></div><div class="cell" row="1" col="4"></div><div class="cell" row="1" col="5"></div><div class="cell" row="1" col="6"></div><div class="cell" row="1" col="7"></div><div class="cell" row="1" col="8"></div></div><div class="row"><div class="cell" row="2" col="0"></div><div class="cell" row="2" col="1"></div><div class="cell" row="2" col="2"></div><div class="cell" row="2" col="3"></div><div class="cell" row="2" col="4"></div><div class="cell" row="2" col="5"></div><div class="cell" row="2" col="6"></div><div class="cell" row="2" col="7"></div><div class="cell" row="2" col="8"></div></div><div class="row"><div class="cell" row="3" col="0"></div><div class="cell" row="3" col="1"></div><div class="cell" row="3" col="2"></div><div class="cell" row="3" col="3"></div><div class="cell" row="3" col="4"></div><div class="cell" row="3" col="5"></div><div class="cell" row="3" col="6"></div><div class="cell" row="3" col="7"></div><div class="cell" row="3" col="8"></div></div><div class="row"><div class="cell" row="4" col="0"></div><div class="cell" row="4" col="1"></div><div class="cell" row="4" col="2"></div><div class="cell" row="4" col="3"></div><div class="cell" row="4" col="4"></div><div class="cell" row="4" col="5"></div><div class="cell" row="4" col="6"></div><div class="cell" row="4" col="7"></div><div class="cell" row="4" col="8"></div></div><div class="row"><div class="cell" row="5" col="0"></div><div class="cell" row="5" col="1"></div><div class="cell" row="5" col="2"></div><div class="cell" row="5" col="3"></div><div class="cell" row="5" col="4"></div><div class="cell" row="5" col="5"></div><div class="cell" row="5" col="6"></div><div class="cell" row="5" col="7"></div><div class="cell" row="5" col="8"></div></div><div class="row"><div class="cell" row="6" col="0"></div><div class="cell" row="6" col="1"></div><div class="cell" row="6" col="2"></div><div class="cell" row="6" col="3"></div><div class="cell" row="6" col="4"></div><div class="cell" row="6" col="5"></div><div class="cell" row="6" col="6"></div><div class="cell" row="6" col="7"></div><div class="cell" row="6" col="8"></div></div><div class="row"><div class="cell" row="7" col="0"></div><div class="cell" row="7" col="1"></div><div class="cell" row="7" col="2"></div><div class="cell" row="7" col="3"></div><div class="cell" row="7" col="4"></div><div class="cell" row="7" col="5"></div><div class="cell" row="7" col="6"></div><div class="cell" row="7" col="7"></div><div class="cell" row="7" col="8"></div></div><div class="row"><div class="cell" row="8" col="0"></div><div class="cell" row="8" col="1"></div><div class="cell" row="8" col="2"></div><div class="cell" row="8" col="3"></div><div class="cell" row="8" col="4"></div><div class="cell" row="8" col="5"></div><div class="cell" row="8" col="6"></div><div class="cell" row="8" col="7"></div><div class="cell" row="8" col="8"></div></div></div>
+						<svg id="svgrenderer" class="boardsvg" xmlns="http://www.w3.org/2000/svg" version="1.1" draggable="false" style="vector-effect: non-scaling-stroke; width: 608px; height: 608px; margin: -16px 0px 0px -16px;" viewBox="-16 -16 608 608">
+							<g class="defs">
+								<defs>
+									<filter id="outlinefilter" class="viewboxsize" x="-16" y="-16" width="608" height="608" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+										<femorphology in="SourceGraphic" result="outline" operator="dilate" radius="0.65"></femorphology>
+										<fecolormatrix values="1000 1000 1000 1000 0 1000 1000 1000 1000 0 1000 1000 1000 1000 0 0 0 0 0.7 0" in="outline" result="outline"></fecolormatrix>
+										<feblend in="SourceGraphic" in2="outline" mode="normal"></feblend>
+									</filter>
+									<filter id="outlinefilter_dark" class="viewboxsize" x="-16" y="-16" width="608" height="608" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+										<femorphology in="SourceGraphic" result="outline" operator="dilate" radius="0.65"></femorphology>
+										<fecolormatrix values="-1000 -1000 -1000 1000 0 -1000 -1000 -1000 1000 0 -1000 -1000 -1000 1000 0 0 0 0 0.7 0" in="outline" result="outline"></fecolormatrix>
+										<feblend in="SourceGraphic" in2="outline" mode="normal"></feblend>
+									</filter>
+								</defs>
+							</g>
+							<g id="background"></g>
+							<g id="underlay"></g>
+							<g id="cell-colors"></g>
+							<g id="arrows"></g>
+							<g id="cages"></g>
+							<g id="cell-highlights"></g>
+							<g id="cell-grids"><path class="cell-grid" d="M0 0 L576 0 M0 64 L576 64 M0 128 L576 128 M0 192 L576 192 M0 256 L576 256 M0 320 L576 320 M0 384 L576 384 M0 448 L576 448 M0 512 L576 512 M0 576 L576 576 M0 0 L0 576 M64 0 L64 576 M128 0 L128 576 M192 0 L192 576 M256 0 L256 576 M320 0 L320 576 M384 0 L384 576 M448 0 L448 576 M512 0 L512 576 M576 0 L576 576"></path><path fill="none" stroke="rgba(0, 0, 0, 1)" stroke-width="3px" class="cage-box" shape-rendering="geometricprecision" vector-effect="non-scaling-stroke" d="M0 0 L96 0 L192 0 L192 96 L192 192 L96 192 L0 192 L0 96 Z"></path><path fill="none" stroke="rgba(0, 0, 0, 1)" stroke-width="3px" class="cage-box" shape-rendering="geometricprecision" vector-effect="non-scaling-stroke" d="M192 0 L288 0 L384 0 L384 96 L384 192 L288 192 L192 192 L192 96 Z"></path><path fill="none" stroke="rgba(0, 0, 0, 1)" stroke-width="3px" class="cage-box" shape-rendering="geometricprecision" vector-effect="non-scaling-stroke" d="M384 0 L480 0 L576 0 L576 96 L576 192 L480 192 L384 192 L384 96 Z"></path><path fill="none" stroke="rgba(0, 0, 0, 1)" stroke-width="3px" class="cage-box" shape-rendering="geometricprecision" vector-effect="non-scaling-stroke" d="M0 192 L96 192 L192 192 L192 288 L192 384 L96 384 L0 384 L0 288 Z"></path><path fill="none" stroke="rgba(0, 0, 0, 1)" stroke-width="3px" class="cage-box" shape-rendering="geometricprecision" vector-effect="non-scaling-stroke" d="M192 192 L288 192 L384 192 L384 288 L384 384 L288 384 L192 384 L192 288 Z"></path><path fill="none" stroke="rgba(0, 0, 0, 1)" stroke-width="3px" class="cage-box" shape-rendering="geometricprecision" vector-effect="non-scaling-stroke" d="M384 192 L480 192 L576 192 L576 288 L576 384 L480 384 L384 384 L384 288 Z"></path><path fill="none" stroke="rgba(0, 0, 0, 1)" stroke-width="3px" class="cage-box" shape-rendering="geometricprecision" vector-effect="non-scaling-stroke" d="M0 384 L96 384 L192 384 L192 480 L192 576 L96 576 L0 576 L0 480 Z"></path><path fill="none" stroke="rgba(0, 0, 0, 1)" stroke-width="3px" class="cage-box" shape-rendering="geometricprecision" vector-effect="non-scaling-stroke" d="M192 384 L288 384 L384 384 L384 480 L384 576 L288 576 L192 576 L192 480 Z"></path><path fill="none" stroke="rgba(0, 0, 0, 1)" stroke-width="3px" class="cage-box" shape-rendering="geometricprecision" vector-effect="non-scaling-stroke" d="M384 384 L480 384 L576 384 L576 480 L576 576 L480 576 L384 576 L384 480 Z"></path></g>
+							<g id="cell-errors"></g>
+							<g id="overlay"></g>
+							<g id="cell-givens"></g>
+							<g id="cell-pen"></g>
+							<g id="cell-pencilmarks"></g>
+							<g id="cell-candidates"></g>
+							<g id="cell-values"></g>
+						</svg>
+
+					</div>
+				</div>
+
+				<div id="controls" class="controls" style="display: flex; transform: translate(24px, 212px) scale(1.231); left: 941px; top: 40px;">
+					<div class="controls-info" style="display: block;">
+						<div class="puzzle-header selectable" style="height: 4em; opacity: 1;">
+							<svg class="header-left" xmlns="http://www.w3.org/2000/svg" version="1.1" draggable="false" style="width: 4rem; height: 4rem;" viewBox="0 0 100 100">
+								<g fill="#83003f">
+									<path d="M30 0 L100,0 L100,100 L30,100 L50,50 L30,0 L100,0"></path>
+									<path d="M0 25 L30,25 L40,50 L30,75 L0,75 L10,50 L0,25"></path>
+								</g>
+							</svg>
+							<svg class="header-right" xmlns="http://www.w3.org/2000/svg" version="1.1" draggable="false" style="width: 4rem; height: 4rem;" viewBox="0 0 100 100">
+								<g transform="scale(-1, 1) translate(-100, 0)" fill="#83003f">
+									<path d="M30 0 L100,0 L100,100 L30,100 L50,50 L30,0 L100,0"></path>
+									<path d="M0 25 L30,25 L40,50 L30,75 L0,75 L10,50 L0,25"></path>
+								</g>
+							</svg>
+							<div class="puzzle-title" title="Classic Sudoku">Classic Sudoku</div>
+							<div class="puzzle-author">&nbsp;by SCF import</div>
+						</div>
+						<div class="rules-copy" title="Copy rules to clipboard"></div>
+						<div class="puzzle-rules selectable" style="display: block;">Normal sudoku rules apply.</div>
+					</div>
+					<div class="controls-buttons">
+						<div class="controls-app controls-small">
+						<button id="control-settings" title="Settings" data-control="settings"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="25" height="25"><path fill="currentColor" d="M487.4 315.7l-42.6-24.6c4.3-23.2 4.3-47 0-70.2l42.6-24.6c4.9-2.8 7.1-8.6 5.5-14-11.1-35.6-30-67.8-54.7-94.6-3.8-4.1-10-5.1-14.8-2.3L380.8 110c-17.9-15.4-38.5-27.3-60.8-35.1V25.8c0-5.6-3.9-10.5-9.4-11.7-36.7-8.2-74.3-7.8-109.2 0-5.5 1.2-9.4 6.1-9.4 11.7V75c-22.2 7.9-42.8 19.8-60.8 35.1L88.7 85.5c-4.9-2.8-11-1.9-14.8 2.3-24.7 26.7-43.6 58.9-54.7 94.6-1.7 5.4.6 11.2 5.5 14L67.3 221c-4.3 23.2-4.3 47 0 70.2l-42.6 24.6c-4.9 2.8-7.1 8.6-5.5 14 11.1 35.6 30 67.8 54.7 94.6 3.8 4.1 10 5.1 14.8 2.3l42.6-24.6c17.9 15.4 38.5 27.3 60.8 35.1v49.2c0 5.6 3.9 10.5 9.4 11.7 36.7 8.2 74.3 7.8 109.2 0 5.5-1.2 9.4-6.1 9.4-11.7v-49.2c22.2-7.9 42.8-19.8 60.8-35.1l42.6 24.6c4.9 2.8 11 1.9 14.8-2.3 24.7-26.7 43.6-58.9 54.7-94.6 1.5-5.5-.7-11.3-5.6-14.1zM256 336c-44.1 0-80-35.9-80-80s35.9-80 80-80 80 35.9 80 80-35.9 80-80 80z"></path></svg></div>Settings</button><button id="control-fullscreen" title="Fullscreen" data-control="fullscreen"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M6 14c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1h3c.55 0 1-.45 1-1s-.45-1-1-1H7v-2c0-.55-.45-1-1-1zm0-4c.55 0 1-.45 1-1V7h2c.55 0 1-.45 1-1s-.45-1-1-1H6c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1zm11 7h-2c-.55 0-1 .45-1 1s.45 1 1 1h3c.55 0 1-.45 1-1v-3c0-.55-.45-1-1-1s-1 .45-1 1v2zM14 6c0 .55.45 1 1 1h2v2c0 .55.45 1 1 1s1-.45 1-1V6c0-.55-.45-1-1-1h-3c-.55 0-1 .45-1 1z"></path></svg></div><div class="icon fullscreen"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M6 16h2v2c0 .55.45 1 1 1s1-.45 1-1v-3c0-.55-.45-1-1-1H6c-.55 0-1 .45-1 1s.45 1 1 1zm2-8H6c-.55 0-1 .45-1 1s.45 1 1 1h3c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1s-1 .45-1 1v2zm7 11c.55 0 1-.45 1-1v-2h2c.55 0 1-.45 1-1s-.45-1-1-1h-3c-.55 0-1 .45-1 1v3c0 .55.45 1 1 1zm1-11V6c0-.55-.45-1-1-1s-1 .45-1 1v3c0 .55.45 1 1 1h3c.55 0 1-.45 1-1s-.45-1-1-1h-2z"></path></svg></div>
+	Fullscreen</button><button id="control-rules" title="Rules" data-control="rules"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M19 3h-4.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm1 14H8c-.55 0-1-.45-1-1s.45-1 1-1h5c.55 0 1 .45 1 1s-.45 1-1 1zm3-4H8c-.55 0-1-.45-1-1s.45-1 1-1h8c.55 0 1 .45 1 1s-.45 1-1 1zm0-4H8c-.55 0-1-.45-1-1s.45-1 1-1h8c.55 0 1 .45 1 1s-.45 1-1 1z"></path></svg></div>Rules</button><button id="control-info" title="Info" data-control="info"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-4h2v2h-2zm1.61-9.96c-2.06-.3-3.88.97-4.43 2.79-.18.58.26 1.17.87 1.17h.2c.41 0 .74-.29.88-.67.32-.89 1.27-1.5 2.3-1.28.95.2 1.65 1.13 1.57 2.1-.1 1.34-1.62 1.63-2.45 2.88 0 .01-.01.01-.01.02-.01.02-.02.03-.03.05-.09.15-.18.32-.25.5-.01.03-.03.05-.04.08-.01.02-.01.04-.02.07-.12.34-.2.75-.2 1.25h2c0-.42.11-.77.28-1.07.02-.03.03-.06.05-.09.08-.14.18-.27.28-.39.01-.01.02-.03.03-.04.1-.12.21-.23.33-.34.96-.91 2.26-1.65 1.99-3.56-.24-1.74-1.61-3.21-3.35-3.47z"></path></svg></div>Info</button><button id="control-restart" title="Restart" data-control="restart"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><mask id="cutout"><rect width="100%" height="100%" fill="#fff"></rect><path d="M12 9c.55 0 1 .45 1 1v4c0 .55-.45 1-1 1s-1-.45-1-1V10c0-.55.45-1 1-1zM12 21zm1-3h-2v-2h2v2z" stroke-width="1.5" stroke="#000" fill="#000"></path></mask><path mask="url(#cutout)" d="M12 5V2.21c0-.45-.54-.67-.85-.35l-3.8 3.79c-.2.2-.2.51 0 .71l3.79 3.79c.32.31.86.09.86-.36V7c3.73 0 6.68 3.42 5.86 7.29-.47 2.27-2.31 4.1-4.57 4.57-3.57.75-6.75-1.7-7.23-5.01-.07-.48-.49-.85-.98-.85-.6 0-1.08.53-1 1.13.62 4.39 4.8 7.64 9.53 6.72 3.12-.61 5.63-3.12 6.24-6.24C20.84 9.48 16.94 5 12 5z"></path><path d="M12 9c.55 0 1 .45 1 1v4c0 .55-.45 1-1 1s-1-.45-1-1V10c0-.55.45-1 1-1zM12 21zm1-3h-2v-2h2v2z"></path></svg></div>Restart</button></div>
+						<div class="controls-main tool-normal">
+							<div class="controls-input">
+								<div class="button-row">
+									<button data-control="value" data-key="1" data-value="1" class="digit" title="1">1</button>
+									<button data-control="value" data-key="2" data-value="2" class="digit" title="2">2</button>
+									<button data-control="value" data-key="3" data-value="3" class="digit" title="3">3</button>
+								</div>
+								<div class="button-row">
+									<button data-control="value" data-key="4" data-value="4" class="digit" title="4">4</button>
+									<button data-control="value" data-key="5" data-value="5" class="digit" title="5">5</button>
+									<button data-control="value" data-key="6" data-value="6" class="digit" title="6">6</button>
+								</div>
+								<div class="button-row">
+									<button data-control="value" data-key="7" data-value="7" class="digit" title="7">7</button>
+									<button data-control="value" data-key="8" data-value="8" class="digit" title="8">8</button>
+									<button data-control="value" data-key="9" data-value="9" class="digit" title="9">9</button>
+								</div>
+								<div class="button-row">
+									<button data-control="value" data-key="0" data-value="0" class="digit" title="0">0</button>
+									<button data-control="delete" title="Delete">
+										<div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H7.07L2.4 12l4.66-7H22v14zm-11.59-2L14 13.41 17.59 17 19 15.59 15.41 12 19 8.41 17.59 7 14 10.59 10.41 7 9 8.41 12.59 12 9 15.59z"></path></svg></div>
+									</button>
+								</div>
+							</div>
+							<div class="controls-tool"><button id="control-normal" title="Digit" data-control="normal" class="selected"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="currentColor"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M18 19H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h12c.55 0 1 .45 1 1v12c0 .55-.45 1-1 1zm1-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><g transform="translate(7.75 17.5) scale(0.0075 -0.0075)"><path d="M832 877q0 152 -28 247.5t-77 147.5q-44 48 -89 66t-99 18q-123 0 -196 -88t-73 -255q0 -94 24 -155t78 -105q38 -31 86 -41.5t103 -10.5q64 0 138 22.5t129 59.5q1 15 2.5 39.5t1.5 54.5zM67 1005q0 115 37.5 210t102.5 164q62 66 151.5 103t181.5 37q103 0 186.5 -34.5 t144.5 -99.5q77 -82 119.5 -215t42.5 -336q0 -185 -41.5 -350.5t-122.5 -274.5q-86 -116 -206.5 -177t-297.5 -61q-40 0 -85 4.5t-84 16.5v191h10q25 -14 78 -27t108 -13q196 0 308 129t127 369q-80 -54 -152.5 -79t-157.5 -25q-83 0 -151 18t-137 70q-80 61 -121 154.5 t-41 225.5z"></path></g></svg></div>Digit</button><button id="control-corner" title="Corner" data-control="corner" class=""><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="currentColor"><path d="M18 19H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h12c.55 0 1 .45 1 1v12c0 .55-.45 1-1 1zm1-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><path transform="translate(6.2 11.2) scale(0.0035 -0.0035)" d="M1179 0h-984v260h314v787h-314v243q69 0 137 9t109 29q48 24 74.5 64.5t30.5 100.5h326v-1233h307v-260z"></path><path transform="translate(13.2 11.2) scale(0.0035 -0.0035)" d="M1245 0h-1094v243q139 110 249.5 208t194.5 186q109 115 158 202t49 179q0 104 -62 159.5t-173 55.5q-57 0 -107.5 -14t-102.5 -36q-51 -23 -87 -47l-54 -36h-29v325q63 30 197 61.5t258 31.5q265 0 401.5 -118t136.5 -332q0 -132 -62 -258.5t-206 -271.5 q-90 -89 -175 -158.5t-123 -98.5h631v-281z"></path><path transform="translate(6.2 18) scale(0.0035 -0.0035)" d="M1208 451q0 -109 -40.5 -199t-118.5 -153q-79 -63 -185.5 -96.5t-259.5 -33.5q-174 0 -298.5 29t-202.5 65v323h36q82 -52 192.5 -90t201.5 -38q54 0 117.5 9.5t106.5 41.5q34 25 54.5 61.5t20.5 103.5q0 66 -29 101.5t-77 51.5q-48 17 -115 19t-118 2h-64v262h59 q68 0 125 6t97 24q40 19 62.5 53t22.5 92q0 45 -21 73.5t-52 44.5q-36 18 -84 24t-82 6q-55 0 -112 -13t-111 -33q-42 -16 -88 -41.5t-68 -38.5h-31v319q77 33 207.5 63.5t266.5 30.5q133 0 230.5 -23t166.5 -67q76 -47 114 -119.5t38 -163.5q0 -127 -73.5 -222.5 t-193.5 -123.5v-14q53 -8 103.5 -27t98.5 -62q45 -39 74.5 -100.5t29.5 -146.5z"></path></svg></div>Corner</button><button id="control-centre" title="Centre" data-control="centre" class=""><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="currentColor"><path d="M18 19H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h12c.55 0 1 .45 1 1v12c0 .55-.45 1-1 1zm1-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path><path transform="translate(7.6, 14.5) scale(0.0035 -0.0035)" d="M1179 0h-984v260h314v787h-314v243q69 0 137 9t109 29q48 24 74.5 64.5t30.5 100.5h326v-1233h307v-260z"></path><path transform="translate(11.6, 14.5) scale(0.0035 -0.0035)" d="M1245 0h-1094v243q139 110 249.5 208t194.5 186q109 115 158 202t49 179q0 104 -62 159.5t-173 55.5q-57 0 -107.5 -14t-102.5 -36q-51 -23 -87 -47l-54 -36h-29v325q63 30 197 61.5t258 31.5q265 0 401.5 -118t136.5 -332q0 -132 -62 -258.5t-206 -271.5 q-90 -89 -175 -158.5t-123 -98.5h631v-281z"></path></svg></div>Centre</button><button id="control-colour" title="Color" data-control="colour" class=""><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="currentColor"><g stroke="#0003" stroke-width=".3"><path d="m12 12 3.36-7.2h3.84v3.84l-7.2 3.36" fill="#e6e6e6"></path><path d="m12 12 7.2-3.36v5.29l-7.2-1.93" fill="#b0b0b0"></path><path d="m12 12 7.2 1.93v5.27h-2.16l-5.04-7.2" fill="#505050"></path><path d="m12 12 5.04 7.2h-5.67l0.63-7.2" fill="#d1efa5"></path><path d="m12 12-0.63 7.2h-6.57l7.2-7.2" fill="#f1b0f6"></path><path d="m12 12-7.2 7.2v-6.57l7.2-0.63" fill="#f3b48f"></path><path d="m12 12-7.2 0.63v-5.67l7.2 5.04" fill="#f39390"></path><path d="m12 12-7.2-5.04v-2.16h5.27l1.93 7.2" fill="#fae799"></path><path d="m12 12-1.93-7.2h5.29l-3.36 7.2" fill="#8ac1f9"></path></g><path d="M18 19H6c-.55 0-1-.45-1-1V6c0-.55.45-1 1-1h12c.55 0 1 .45 1 1v12c0 .55-.45 1-1 1zm1-16H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path></svg></div>Color</button></div>
+						</div>
+						<div class="controls-aux"><button id="control-undo" title="Undo" data-control="undo"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L3.71 8.71C3.08 8.08 2 8.52 2 9.41V15c0 .55.45 1 1 1h5.59c.89 0 1.34-1.08.71-1.71l-1.91-1.91c1.39-1.16 3.16-1.88 5.12-1.88 3.16 0 5.89 1.84 7.19 4.5.27.56.91.84 1.5.64.71-.23 1.07-1.04.75-1.72C20.23 10.42 16.65 8 12.5 8z"></path></svg></div>Undo</button><button id="control-redo" title="Redo" data-control="redo"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.16 0-7.74 2.42-9.44 5.93-.32.67.04 1.47.75 1.71.59.2 1.23-.08 1.5-.64 1.3-2.66 4.03-4.5 7.19-4.5 1.95 0 3.73.72 5.12 1.88l-1.91 1.91c-.63.63-.19 1.71.7 1.71H21c.55 0 1-.45 1-1V9.41c0-.89-1.08-1.34-1.71-.71l-1.89 1.9z"></path></svg></div>Redo</button><button id="control-check" title="Check" data-control="check"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24"><path d="M0 0h24v24H0V0z" fill="none"></path><path d="M9 16.17L5.53 12.7c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l4.18 4.18c.39.39 1.02.39 1.41 0L20.29 7.71c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0L9 16.17z"></path></svg></div>Check</button><button id="control-select" title="Select" data-control="select"><div class="icon"><svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8.5 8.5h-5.2v-4.2c0-.55.45-1 1-1h4.2v5.2zM3.3 9.3h5.2v5.2h-5.2v-5.2zM8.5 20.5h-4.2c-.55 0-1-.45-1-1v-4.2h5.2v5.2zM9.3 3.3h5.2v5.2h-5.2v-5.2zM9.3 9.3h5.2v5.2h-5.2v-5.2zM9.3 15.3h5.2v5.2h-5.2v-5.2zM20.5 8.5h-5.2v-5.2h4.2c.55 0 1 .45 1 1v4.2zM15.3 9.3h5.2v5.2h-5.2v-5.2zM19.5 20.5h-4.2v-5.2h5.2v4.2c0 .55-.45 1-1 1z"></path><path transform="translate(2.9, 2.9) scale(0.0935)" fill="rgba(255, 215, 0, 0.5)" stroke="rgba(0, 126, 255, 1)" stroke-width="15" stroke-linecap="butt" stroke-linejoin="round" d="M138 10L182 10L182 118L138 118 ZM10 74L54 74L54 118L10 118 ZM74 138L118 138L118 182L74 182 Z"></path></svg></div>Select</button></div>
+					</div>
+					<div class="controls-footer">
+						Created by <a href="https://svencodes.com/" target="_blank">Sven Neumann</a> (©) | Support me on <a href="https://patreon.svencodes.com/">Patreon</a>
+					</div>
+				</div>
+
+			</div>
+		</div>
+
+		<!--BUNDLE[/sudokupad.bundle.js]-->
+		<script defer="" src="./sudoku_pad_scripts/portableevents.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/utilities.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/framework.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/puzzletools.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/puzzleloader.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/rulesparser.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/stegosaur.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/solver.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/controls-app.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/tool-color.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/controls-tools.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/tool-pen.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/tool-replay.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/tool-select.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/tool-letter.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/tool-calculator.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-conflictchecker.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-marksolveddigits.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-showseencells.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-labelrowscols.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-fog.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-bgimage.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-fpuz.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-gifting.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-compactmarks.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-puzzleevents.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-replaygif.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-replaysave.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-uitheme.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-cellpaste.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-settingssave.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-solvedcounter.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-debug.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-shorturl.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-customcolors.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-endless.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-emoji.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-rulealert.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-streamtool.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-screenshot.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-puzzlepack.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-userplugins.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-seasonal.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-sudokupadpro.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-hairgag.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-largepuzzle.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-layout.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-gridrules.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-markup.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-copycells.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-project9x9.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/feature-puzzlefont.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/app-settings.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/appmenu.js"></script>
+		<script defer="" src="./sudoku_pad_scripts/script.js"></script>
+		<!--/BUNDLE[/sudokupad.bundle.js]-->
+
+		<!--BUNDLE[/sudokupad-tools.bundle.css]-->
+		<link rel="stylesheet" href="./sudoku_pad_scripts/tool-color.css">
+		<link rel="stylesheet" href="./sudoku_pad_scripts/tool-pen.css">
+		<link rel="stylesheet" href="./sudoku_pad_scripts/tool-replay.css">
+		<link rel="stylesheet" href="./sudoku_pad_scripts/tool-letter.css">
+		<link rel="stylesheet" href="./sudoku_pad_scripts/tool-calculator.css">
+		<!--/BUNDLE[/sudokupad-tools.bundle.css]-->
+
+		<script defer="">
+			function preventZoom(event) {
+				console.log('preventZoom:', event);
+				event.preventDefault();
+				document.body.style.zoom = 0.999999;
+			}
+			document.addEventListener('gesturestart', preventZoom);
+			document.addEventListener('gesturechange', preventZoom);
+			document.addEventListener('gestureend', preventZoom);
+		</script>
+
+		<script defer="" src="./sudoku_pad_scripts/lazygtmloader.js"></script>
+
+
+<deepl-input-controller><template shadowrootmode="open"><link rel="stylesheet" href="chrome-extension://cofdbpoegempjloogbagkncekinflcnj/build/content.css"><div dir="ltr" style="visibility: initial !important;"><div class="dl-input-translation-container svelte-95aucy"><div></div></div></div></template></deepl-input-controller></body></html>

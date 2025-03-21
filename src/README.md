@@ -1,0 +1,4 @@
+- **[eval](eval/)**: Framework for evaluating LLMs on Sudoku puzzles through multi-round interaction protocols
+- **[sudokupad_interaction](sudokupad_interaction/)**: Tools for interacting with the SudokuPad app
+- **[ctc_processing](ctc_processing/)**: Utilities for processing CTC reasoning traces into LM-compatible formats
+- **[sudoku_ds.py](sudoku_ds.py)**: Python-only implementation of the Sudoku data structures
