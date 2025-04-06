@@ -27,7 +27,7 @@ The raw CTC data comes in the form of separate records of 1) Whisper ASR transcr
 ### 0. Extract processable puzzles
 
 Before processing the raw data, we first filter out the puzzles that are unsuitable for training LMs. There are several reasons that render a puzzle unsuitable.
-- We devised [a set of grammar](#lm-sudoku-grammar) to encode the Sudoku actions and boards (e.g. `<vl><value1><r5><c3>` denotes the action of filling digit 5 at row 5 column 3), so they can be properly linearized and integrated into the reasoning traces for language modeling. But CTC puzzles include unstandard variants, which creates many edge cases that are not covered by our grammar. So we filter out the puzzles that are incompatible with our (current) grammar.
+- We devised [a set of grammar](#lm-sudoku-grammar) to encode the Sudoku actions and boards (e.g. `<vl><value1><r5><c3>` denotes the action of filling digit 1 at row 5 column 3), so they can be properly linearized and integrated into the reasoning traces for language modeling. But CTC puzzles include unstandard variants, which creates many edge cases that are not covered by our grammar. So we filter out the puzzles that are incompatible with our (current) grammar.
 - In some CTC puzzles, the author decided not to disclose the solution, which makes it hard to verify the correctness of the extracted Sudoku actions. We filter out these puzzles as well.
 
 ```bash
