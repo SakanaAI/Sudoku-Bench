@@ -50,6 +50,8 @@ import os
 import sys
 from typing import Any, Dict, List, Optional, Union
 import uuid
+import re
+
 
 import aiohttp
 import anthropic
@@ -72,6 +74,7 @@ from eval.prompts import (
     BOARD_PROMPT,
     PREFILLED_ASSISTANT_RESPONSE,
     RULE_PROMPT,
+    ONE_SHOT_PROMPT,
 )
 from eval.utils import (
     extract_action_from_response,
@@ -95,7 +98,19 @@ async def call_api(
     while attempt < args.max_retries:
         try:
             # OpenAI API
-            if isinstance(client, openai.AsyncOpenAI):
+            if args.api == "openrouter":
+                kwargs = {
+                    "model": model,
+                    "messages": messages,
+                    "temperature": args.temperature,
+                    "top_p": args.top_p,
+                }
+                completion = await client.chat.completions.create(**kwargs)
+                if not completion.choices:
+                    # typically due to rate limiting
+                    raise ValueError(f"API response missing 'choices'. Error: {completion.error['message']}")
+                output_text = completion.choices[0].message.content
+            elif isinstance(client, openai.AsyncOpenAI):
                 kwargs = {
                     "model": model,
                     "messages": messages,
@@ -106,8 +121,9 @@ async def call_api(
                 if "o1-" in model or "o3-" in model:
                     kwargs["max_completion_tokens"] = args.max_tokens
                     kwargs["temperature"] = 1.0
+                    kwargs.pop('top_p', None)
                 # Special setting for R1 (TogetherAI)
-                if model == "deepseek-ai/DeepSeek-R1":
+                elif model == "deepseek-ai/DeepSeek-R1":
                     kwargs["temperature"] = 0.6
                     kwargs["max_tokens"] = None
                 else:
@@ -132,6 +148,8 @@ async def call_api(
                         "type": "enabled",
                         "budget_tokens": args.max_tokens - 1024,
                     }
+                    kwargs.pop('top_k', None)
+                    kwargs.pop('top_p', None)
                 # Handle system prompts for Anthropic APIs
                 if messages[0]["role"] == "system":
                     kwargs["system"] = messages[0]["content"]
@@ -164,6 +182,7 @@ async def call_api(
             
         except Exception as e:
             attempt += 1
+            print(f"Attempt {attempt} failed. {e}")
             if attempt == args.max_retries:
                 print(f"Failed after {args.max_retries} attempts for request. {e}")
                 return None
@@ -357,18 +376,121 @@ async def process_one(
     }
 
 
+async def process_one_single_shot(
+    args: argparse.Namespace,
+    client: Union[Any],
+    request: Dict,
+    model: str,
+    tokenizer: Optional[AutoTokenizer] = None,
+) -> Dict:
+    # Load data
+    rules = request["rules"]
+    initial_board_ascii = request["initial_board"]
+    solution_ascii = request["solution"]
+    rows = request["rows"]
+    cols = request["cols"]
+    visual_elements = request["visual_elements"]
+    if pd.isna(visual_elements) or visual_elements == "":
+        visual_elements = None
+    n_history_turns = request["n_history_turns"] # Keep for consistency in output format
+
+    # Construct setting string (simplified for single-shot)
+    settings = ["single-shot"]
+    if request["num_empty_cells"] > 0:
+        settings.append(f"{request['num_empty_cells']}-empty-{request['shuffle_seed']}-seed")
+    setting = "_".join(settings)
+
+    # Pretty print visual elements
+    pretty_visual_elements = None
+    if visual_elements is not None:
+        try:
+            visual_elements = json.loads(visual_elements)
+            pretty_visual_elements = pretty_print_visual_elements(visual_elements)
+        except json.JSONDecodeError:
+            print(f"Warning: Could not parse visual_elements for puzzle {request['puzzle_id']}")
+            visual_elements = None # Set to None if parsing fails
+
+    # Construct the single prompt
+    one_shot_prompt = jinja2.Template(ONE_SHOT_PROMPT).render(
+        rows=rows,
+        cols=cols,
+        rules=rules,
+        pretty_visual_elements=pretty_visual_elements,
+        current_board=initial_board_ascii,
+    )
+
+    # Single conversation turn
+    input_conversation = [{"role": "user", "content": one_shot_prompt}]
+
+    # Call API
+    assistant_response = await call_api(
+        args=args,
+        client=client,
+        model=model,
+        tokenizer=tokenizer,
+        messages=input_conversation,
+    )
+
+    parsed_answer = ""
+    final_solved = 0
+
+    if assistant_response:
+        # Update conversation history (just this single turn)
+        conversation = input_conversation + [{"role": "assistant", "content": assistant_response}]
+
+        # Extract answer from <ANSWER> tags
+        match = re.search(r"<ANSWER>(.*?)</ANSWER>", assistant_response, re.DOTALL | re.IGNORECASE)
+        if match:
+            answer_content = match.group(1)
+            # Extract only digits
+            parsed_answer = "".join(filter(str.isdigit, answer_content))
+            # Check if parsed answer matches solution
+            if parsed_answer == solution_ascii:
+                final_solved = 1
+                print(f"[Pass] Puzzle {request['puzzle_id']} solved correctly.")
+            else:
+                print(f"[Fail] Puzzle {request['puzzle_id']} incorrect.")
+        else:
+            print(f"[Fail] Puzzle {request['puzzle_id']}. No <ANSWER> tag found in response.")
+            conversation = input_conversation # Record only user prompt if assistant failed
+    else:
+        print(f"[Fail] Puzzle {request['puzzle_id']}. No response from server.")
+        conversation = input_conversation # Record only user prompt if assistant failed
+
+
+    return {
+        # From input
+        "data_source": args.dataset,
+        "puzzle_id": request["puzzle_id"],
+        "model": args.model_save_name if args.model_save_name else model,
+        "num_empty_cells": request["num_empty_cells"],
+        "shuffle_seed": request["shuffle_seed"],
+        "n_response_idx": request["n_response_idx"],
+        "n_history_turns": n_history_turns, # Retained for consistency
+        "setting": setting,
+        "initial_board": request["initial_board"],
+        # From output
+        "conversation": json.dumps(conversation),
+        "num_rounds": 1, # Single shot = 1 round
+        "num_correct_placements": final_solved, # Treat solved as 1 correct 'placement'
+        "final_solved": final_solved,
+        "final_board": parsed_answer, # The parsed digit string from the response
+    }
+
+
 async def process_batch(
     args: argparse.Namespace,
     requests: List[Dict],
     client: Union[Any],
     model: str,
     tokenizer: Optional[AutoTokenizer] = None,
-    batch_size: int = 1
+    batch_size: int = 1,
+    process_func: callable = process_one
 ) -> List[Dict]:
     semaphore = asyncio.Semaphore(batch_size)
     async def process_with_semaphore(request):
         async with semaphore:
-            return await process_one(
+            return await process_func(
                 args=args,
                 client=client,
                 request=request,
@@ -383,7 +505,8 @@ async def process_batch(
     with tqdm(total=len(tasks), desc="Processing requests") as pbar:
         for coro in asyncio.as_completed(tasks):
             result = await coro
-            outputs.append(result)
+            if result:
+                 outputs.append(result)
             pbar.update(1)
     
     return outputs
@@ -430,7 +553,7 @@ def construct_request(
     
 
 def main():
-    parser = argparse.ArgumentParser(description="Evaluate LLM on Sudoku puzzles in a multi-round manner.")
+    parser = argparse.ArgumentParser(description="Evaluate LLM on Sudoku puzzles.")
 
     # Filepaths
     parser.add_argument("--dataset", type=str, required=True, choices=["challenge_100", "nikoli_100", "ctc"],
@@ -447,6 +570,8 @@ def main():
                         help="Specific puzzle indices to evaluate. Overrides start/end.")
 
     # Eval setting
+    parser.add_argument("--mode", type=str, default="multi_round", choices=["multi_round", "single_shot"],
+                        help="Evaluation mode: multi-round interaction or single-shot completion.")
     # The number of evaluations for each puzzle is the product of the following four arguments.
     parser.add_argument("--num_empty_cells", type=int, nargs="+", default=[0, 10, 20],
                         help="Number of empty cells in the intial board after hint fill in random cells. "
@@ -460,7 +585,7 @@ def main():
 
     # Model
     parser.add_argument("--api", type=str, default="openai",
-                        choices=["openai", "anthropic", "anthropic_bedrock", "deepseek", "vllm", "togetherai"],
+                        choices=["openai", "anthropic", "anthropic_bedrock", "deepseek", "vllm", "togetherai", "openrouter"],
                         help="API to use.")
     parser.add_argument("--model", type=str, required=True,
                         help="Model name or path.")
@@ -494,6 +619,9 @@ def main():
     # Sanity check
     assert args.num_empty_cells != [0] or len(args.shuffle_seeds) == 1, \
         "shuffle_seed is only used when providing hints (i.e. num_empty_cells > 0)."
+    if args.mode == "single_shot" and args.n_history_turns != [5]:
+         print("Warning: --n_history_turns is ignored in single_shot mode.")
+         args.n_history_turns = [0]
 
     # Load puzzle
     dataset = datasets.load_dataset("SakanaAI/Sudoku-Bench", args.dataset, split="test")
@@ -538,6 +666,11 @@ def main():
         client = openai.AsyncOpenAI(
             api_key=os.environ.get("OPENAI_API_KEY"),
         )
+    elif args.api == "openrouter":
+        client = openai.AsyncOpenAI(
+            api_key=os.environ.get("OPENROUTER_API_KEY"),
+            base_url="https://openrouter.ai/api/v1",
+        )
     elif args.api == "anthropic":
         client = anthropic.AsyncAnthropic(
             api_key=os.environ.get("ANTHROPIC_API_KEY"),
@@ -555,9 +688,11 @@ def main():
         )
     elif args.api == "togetherai":
         client = openai.AsyncOpenAI(
-            api_key=os.environ.get("TOGETHERAI_API_KEY"),
+            api_key=os.environ.get("TOGETHER_API_KEY"),
             base_url="https://api.together.xyz/v1",
         )
+    elif args.api == "googleai": # Add googleai client setup
+        client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"))
     elif args.api == "vllm":
         client = AsyncLLMEngine.from_engine_args(
             AsyncEngineArgs(
@@ -575,36 +710,57 @@ def main():
         )
         tokenizer = AutoTokenizer.from_pretrained(args.model)
         
-    # Process batch
+    # Select processing function based on mode
+    process_func = process_one if args.mode == "multi_round" else process_one_single_shot
+    print(f"Running in {args.mode} mode.")
+
+    # Process batch using the selected function
     all_results = asyncio.run(process_batch(
         args=args,
         batch_size=args.batch_size,
         requests=requests,
         client=client,
         tokenizer=tokenizer,
-        model=args.model
+        model=args.model,
+        process_func=process_func # Pass the selected function
     ))
 
     # Convert results to DataFrame
+    if not all_results: # Check if list is empty
+        print("No results generated. Exiting.")
+        return # Exit if no results
     res_df = pd.DataFrame(all_results)
     if len(res_df) == 0:
-        print("No results to save. Possibly no puzzles or an error occurred.")
+        print("No results to save. DataFrame is empty.")
         return
 
     # Print summary
     # We'll measure average number of correct placements and fraction of puzzles solved.
     group_cols = ["num_empty_cells", "setting", "model"]
-    summary = (
-        res_df
-        .groupby(group_cols)
-        .agg({
-            "num_correct_placements": "mean",
-            "final_solved": "mean"
-        })
-        .reset_index()
-    )
-    with pd.option_context("display.max_rows", None, "display.precision", 2):
-        print(summary)
+    agg_metrics = {"final_solved": "mean"}
+    if args.mode == "multi_round":
+         # Only include multi-round specific metrics if in that mode
+         agg_metrics["num_correct_placements"] = "mean"
+
+    # Ensure columns exist before aggregation
+    existing_cols = [col for col in group_cols if col in res_df.columns]
+    if not existing_cols:
+         print("Grouping columns not found in results DataFrame. Cannot generate summary.")
+         summary_str = "Summary could not be generated."
+    else:
+        summary = (
+            res_df
+            .groupby(existing_cols)
+            .agg(agg_metrics)
+            .reset_index()
+        )
+        with pd.option_context("display.max_rows", None, "display.precision", 3):
+             summary_str = summary.to_string()
+
+    print("\\n--- Summary ---")
+    print(summary_str)
+    print("---------------")
+
 
     # Save results to CSV
     os.makedirs(os.path.dirname(args.output_csv), exist_ok=True)
