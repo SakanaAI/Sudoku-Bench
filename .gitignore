@@ -1,5 +1,8 @@
 reports
 data/benchmark_results
+*.csv
+*.html
+*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
