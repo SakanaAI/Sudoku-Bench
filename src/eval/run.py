@@ -1,14 +1,17 @@
-# TODO:
-# - add logging for number of tokens
 """
 Evaluate LLM on Sudoku puzzles using an API.
 
-We call the LLM repeatedly:
-  1) Provide an initial puzzle prompt.
-  2) LLM responds with a single forced placement (e.g., <ANSWER>\nr3c6: 5\n</ANSWER>).
-  3) We check if that placement is valid and correct based on the puzzle's known solution.
-  4) If correct, we update the board and continue; if incorrect, we stop.
-  5) Continue until the puzzle is solved or we reach a maximum number of steps.
+This script evaluates LLMs on Sudoku puzzles in three modes:
+  1) single_shot: LLM solves the entire puzzle in one response
+  2) single_step: LLM makes one placement at a time
+  3) multi_step: LLM makes at least one, but potentially multiple, placements at a time
+
+In the step-by-step modes, we:
+  1) Provide an initial puzzle prompt
+  2) LLM responds with a placement (e.g., <ANSWER>\nr3c6: 5\n</ANSWER>)
+  3) We check if that placement is valid and correct
+  4) If correct, we update the board and continue; if incorrect, we stop
+  5) Continue until the puzzle is solved or we reach a maximum number of steps
 
 Example Usage:
 --------------
@@ -40,6 +43,8 @@ A CSV file with columns:
     "num_correct_placements",
     "final_solved",
     "final_board",
+    "initial_board",
+    "stop_reason",
 ]
 
 Plus a summary of average correctness/final-solved rates in stdout.
@@ -49,12 +54,10 @@ import argparse
 import asyncio
 import json
 import os
-import sys
 from typing import Any, Dict, List, Optional, Union
 import uuid
 import re
 
-import aiohttp
 import anthropic
 import datasets
 import jinja2
@@ -142,8 +145,9 @@ async def call_api(
                 try:
                     output_text = response.candidates[0].content.parts[0].text
                 except:
-                    # typically due to rate limiting
-                    raise ValueError(f"API response missing 'choices'. Error: {completion.error['message']}")
+                    # Safer access to potential error message
+                    error_message = getattr(response, 'error', {}).get('message', 'Unknown error')
+                    raise ValueError(f"API response missing 'candidates' or content. Error: {error_message}")
             elif args.api == "openrouter":
                 kwargs = {
                     "model": model,
@@ -157,8 +161,9 @@ async def call_api(
                     kwargs["top_p"] = 0.95
                 completion = await client.chat.completions.create(**kwargs)
                 if not completion.choices:
-                    # typically due to rate limiting
-                    raise ValueError(f"API response missing 'choices'. Error: {completion.error['message']}")
+                    # Safer access to potential error message
+                    error_message = getattr(completion, 'error', {}).get('message', 'Unknown error')
+                    raise ValueError(f"API response missing 'choices'. Error: {error_message}")
                 output_text = completion.choices[0].message.content
             elif isinstance(client, openai.AsyncOpenAI):
                 kwargs = {
@@ -771,18 +776,15 @@ async def process_one_single_shot(
     conversation = input_conversation # Default conversation if API fails
 
     if assistant_response:
-        # Update conversation history (just this single turn)
         conversation = input_conversation + [{"role": "assistant", "content": assistant_response}]
 
         # Extract answer from <ANSWER> tags
-        # match = re.search(r"<ANSWER>(.*?)</ANSWER>", assistant_response, re.DOTALL | re.IGNORECASE)
         blocks = re.findall(r"<ANSWER>(.*?)</ANSWER>", assistant_response,re.DOTALL | re.IGNORECASE)
         if blocks:
             answer_content = blocks[-1].strip() # Use last match
             # Extract only digits
             parsed_answer = "".join(filter(str.isdigit, answer_content))
             parsed_answer = parsed_answer[-rows * cols:]  # Keep only the last board-length chunk
-            # Check if parsed answer matches solution
             if parsed_answer == solution_ascii:
                 final_solved = 1
                 stop_reason = "solved"
@@ -796,7 +798,6 @@ async def process_one_single_shot(
     else:
         stop_reason = "api_error"
         print(f"[Fail] Puzzle {request['puzzle_id']}. No response from server.")
-        # conversation remains just the input_conversation
 
     return {
         # From input
@@ -972,23 +973,17 @@ def main():
 
     # Load puzzle
     dataset = datasets.load_dataset("SakanaAI/Sudoku-Bench", args.dataset, split="test")
-    print(f"length of HF dataset: {len(dataset)}")
+
     # Load continue_from csv if provided
-    # TODO: special handling for api_error?
     continue_from = False
     already_processed = None
     if args.continue_from:
         if os.path.exists(args.continue_from):
-            # keep the really‑long digit sequence as text, not a number
-            continue_from_df = pd.read_csv(
-                args.continue_from, dtype={"final_board": str}
-            )
-            print(f"length of continue_from_df: {len(continue_from_df)}")
-            # already_processed = continue_from_df[continue_from_df["final_board"].notna()]
-            # Filter based on stop reason as before, dtype handles the format issue
+            continue_from_df = pd.read_csv(args.continue_from, dtype={"final_board": str})
             already_processed = continue_from_df[continue_from_df["stop_reason"] != "api_error"]
-            print(f"Already processed {len(already_processed)} puzzles.")
+            print(f"Loaded {len(continue_from_df)} rows from {args.continue_from}, of which {len(already_processed)} already have responses.")
             continue_from = True
+
     # Use a subset of puzzles if specified
     if args.ilocs is not None:
         ilocs = args.ilocs
@@ -996,12 +991,11 @@ def main():
         end_idx = args.iloc_end if args.iloc_end is not None else len(dataset)
         ilocs = range(args.iloc_start, end_idx)
     puzzle_rows = [dataset[i] for i in ilocs]
+
     # Filter out puzzles that have already been evaluated
     if args.continue_from and already_processed is not None and continue_from:
         puzzle_rows = [row for row in puzzle_rows if row["puzzle_id"] not in already_processed["puzzle_id"].tolist()]
 
-    print(f"Number of puzzles to evaluate: {len(puzzle_rows)}")
-    # raise ValueError("Stop here.")
     # Construct requests
     requests = []
     for puzzle_row in puzzle_rows:
@@ -1060,6 +1054,7 @@ def main():
             base_url="https://api.together.xyz/v1",
         )
     elif args.api == "googleai":
+        # Add 12 minute timeout (Gemini 2.5 can stall if timeout not specified)
         client = genai.Client(api_key=os.environ.get("GOOGLE_API_KEY"),
                               http_options=types.HttpOptions(timeout=1000*60*12))
     elif args.api == "vllm":
@@ -1081,16 +1076,15 @@ def main():
 
     # Select processing function based on mode
     if args.mode == "single_step":
-        process_func = process_one # Use the original single-step function
+        process_func = process_one
         print(f"Running in single_step mode.")
     elif args.mode == "multi_step":
-        process_func = process_one_multi_step # Use the new multi-step function
-        print(f"Running in multi_step (multi-step action) mode.")
+        process_func = process_one_multi_step
+        print(f"Running in multi_step mode.")
     elif args.mode == "single_shot":
         process_func = process_one_single_shot
-        print(f"Running in {args.mode} mode.")
+        print(f"Running in single_shot mode.")
     else:
-        # Should not happen due to choices constraint, but good practice
         raise ValueError(f"Unknown mode: {args.mode}")
 
 
@@ -1102,13 +1096,13 @@ def main():
         client=client,
         tokenizer=tokenizer,
         model=args.model,
-        process_func=process_func # Pass the selected function
+        process_func=process_func
     ))
 
     # Convert results to DataFrame
-    if not all_results: # Check if list is empty
+    if not all_results:
         print("No results generated. Exiting.")
-        return # Exit if no results
+        return
     res_df = pd.DataFrame(all_results)
     if len(res_df) == 0:
         print("No results to save. DataFrame is empty.")
@@ -1127,7 +1121,7 @@ def main():
     # We'll measure average number of correct placements and fraction of puzzles solved.
     group_cols = ["num_empty_cells", "setting", "model"]
     agg_metrics = {"final_solved": "mean"}
-    if args.mode == "multi_round":
+    if args.mode in ["single_step", "multi_step"]:
          # Only include multi-round specific metrics if in that mode
          agg_metrics["num_correct_placements"] = "mean"
 
