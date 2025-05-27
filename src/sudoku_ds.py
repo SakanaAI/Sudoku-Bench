@@ -7,19 +7,18 @@ from typing import Optional, Tuple, Set, Union, Any
 
 
 ##########################
-# Shared representations #
 ##########################
 def coord_to_token(row: int, col: int, combine_position: bool) -> str:
     """
-    Generate a token for coordinates.
+    座標のトークンを生成します。
     
-    Args:
-        row: Row number (1-indexed)
-        col: Column number (1-indexed)
-        combine_position: Whether to combine row and column into one token
+    引数:
+        row: 行番号（1から始まる）
+        col: 列番号（1から始まる）
+        combine_position: 行と列を1つのトークンに結合するかどうか
         
-    Returns:
-        String token representing the coordinates
+    戻り値:
+        座標を表す文字列トークン
     """
     if combine_position:
         return f"<r{row}c{col}>"
@@ -29,42 +28,42 @@ def coord_to_token(row: int, col: int, combine_position: bool) -> str:
 
 def value_to_token(value: str) -> str:
     """
-    Generate a token for values.
+    値のトークンを生成します。
     
-    Args:
-        value: The value to convert to a token
+    引数:
+        value: トークンに変換する値
         
-    Returns:
-        String token representing the value
+    戻り値:
+        値を表す文字列トークン
     """
     return f"<value{value}>"
 
 
 def color_to_token(color: str) -> str:
     """
-    Generate a token for colors.
+    色のトークンを生成します。
     
-    Args:
-        color: The color to convert to a token
+    引数:
+        color: トークンに変換する色
         
-    Returns:
-        String token representing the color
+    戻り値:
+        色を表す文字列トークン
     """
     return f"<color{color}>"
 
 
 def token_to_coord(token: str) -> Tuple[int, int]:
     """
-    Extract coordinates from a token.
+    トークンから座標を抽出します。
     
-    Args:
-        token: The token containing coordinate information
+    引数:
+        token: 座標情報を含むトークン
         
-    Returns:
-        A tuple of (row, col) as integers
+    戻り値:
+        (行, 列)の整数タプル
         
-    Raises:
-        ValueError: If the token format is invalid
+    例外:
+        ValueError: トークンの形式が無効な場合
     """
     combine_position = token.count(">") == 1
     if combine_position:
@@ -72,109 +71,107 @@ def token_to_coord(token: str) -> Tuple[int, int]:
         if match:
             row, col = match.groups()
         else:
-            raise ValueError(f"Invalid row-col token: {token}")
+            raise ValueError(f"無効な行列トークン: {token}")
     else:
         match = re.match(r"<r(\d+)><c(\d+)>", token)
         if match:
             row, col = match.groups()
         else:
-            raise ValueError(f"Invalid row-col token: {token}")
+            raise ValueError(f"無効な行列トークン: {token}")
     return int(row), int(col)
 
 
 def token_to_value(token: str) -> str:
     """
-    Extract value from a token.
+    トークンから値を抽出します。
     
-    Args:
-        token: The token containing value information
+    引数:
+        token: 値情報を含むトークン
         
-    Returns:
-        The extracted value as a string
+    戻り値:
+        抽出された値（文字列）
         
-    Raises:
-        ValueError: If the token format is invalid
+    例外:
+        ValueError: トークンの形式が無効な場合
     """
     match = re.match(r"<value(.)>", token)
     if not match:
-        raise ValueError(f"Invalid value token: {token}")
+        raise ValueError(f"無効な値トークン: {token}")
     return match.group(1)
 
 
 def token_to_color(token: str) -> str:
     """
-    Extract color from a token.
+    トークンから色を抽出します。
     
-    Args:
-        token: The token containing color information
+    引数:
+        token: 色情報を含むトークン
         
-    Returns:
-        The extracted color as a string
+    戻り値:
+        抽出された色（文字列）
         
-    Raises:
-        ValueError: If the token format is invalid
+    例外:
+        ValueError: トークンの形式が無効な場合
     """
     match = re.match(r"<color(.)>", token)
     if not match:
-        raise ValueError(f"Invalid color token: {token}")
+        raise ValueError(f"無効な色トークン: {token}")
     return match.group(1)
 
 
 ######################
-# Sudoku Basic Types #
 ######################
 class ActionType(Enum):
-    """Enumeration of possible Sudoku action types."""
-    SELECT = "sl"
-    DESELECT = "ds"
-    VALUE = "vl"
-    PENCILMARK = "pm"
-    CANDIDATE = "cd"
-    COLOR = "co"
-    PEN = "pe"   # Not used for now
-    CLEAR = "cl"
+    """数独アクションタイプの列挙型。"""
+    SELECT = "sl"      # 選択
+    DESELECT = "ds"    # 選択解除
+    VALUE = "vl"       # 値の配置
+    PENCILMARK = "pm"  # ペンシルマーク
+    CANDIDATE = "cd"   # 候補数字
+    COLOR = "co"       # 色
+    PEN = "pe"         # ペン（現在は使用されていません）
+    CLEAR = "cl"       # クリア
 
 
 class OperationType(Enum):
-    """Enumeration of possible operations (add or remove)."""
-    ADD = "+"
-    REMOVE = "-"
+    """操作タイプ（追加または削除）の列挙型。"""
+    ADD = "+"          # 追加
+    REMOVE = "-"       # 削除
 
 
 class ValueType(Enum):
-    """Enumeration of possible cell values."""
-    empty = "."
-    number0 = "0"
-    number1 = "1"
-    number2 = "2"
-    number3 = "3"
-    number4 = "4"
-    number5 = "5"
-    number6 = "6"
-    number7 = "7"
-    number8 = "8"
-    number9 = "9"
+    """セル値の列挙型。"""
+    empty = "."        # 空
+    number0 = "0"      # 数字0
+    number1 = "1"      # 数字1
+    number2 = "2"      # 数字2
+    number3 = "3"      # 数字3
+    number4 = "4"      # 数字4
+    number5 = "5"      # 数字5
+    number6 = "6"      # 数字6
+    number7 = "7"      # 数字7
+    number8 = "8"      # 数字8
+    number9 = "9"      # 数字9
 
     def __lt__(self, other: "ValueType") -> bool:
-        """Compare two ValueType objects based on their values."""
+        """値に基づいて2つのValueTypeオブジェクトを比較します。"""
         return int(self.value) < int(other.value)
 
 
 class ColorType(Enum):
-    """Enumeration of possible colors for marking cells."""
-    color0 = "0"
-    color1 = "1"
-    color2 = "2"
-    color3 = "3"
-    color4 = "4"
-    color5 = "5"
-    color6 = "6"
-    color7 = "7"
-    color8 = "8"
-    color9 = "9"
+    """セルのマーキングに使用される色の列挙型。"""
+    color0 = "0"       # 色0
+    color1 = "1"       # 色1
+    color2 = "2"       # 色2
+    color3 = "3"       # 色3
+    color4 = "4"       # 色4
+    color5 = "5"       # 色5
+    color6 = "6"       # 色6
+    color7 = "7"       # 色7
+    color8 = "8"       # 色8
+    color9 = "9"       # 色9
 
 
-# Set of actions that only affect selection state
 SELECTION_ACTIONS = set([
     ActionType.SELECT.value,
     ActionType.DESELECT.value,
@@ -182,38 +179,37 @@ SELECTION_ACTIONS = set([
 
 
 ########################
-# Sudoku Cell Handling #
 ########################
 class SudokuCell:
     """
-    Class to handle the Sudoku cell state and tokenization.
+    数独セルの状態とトークン化を処理するクラス。
 
-    Row and column are 1-indexed.
+    行と列は1から始まるインデックスです。
     
-    Attributes:
-        row (int): The row position (1-indexed)
-        col (int): The column position (1-indexed)
-        value (ValueType): The primary value in the cell
-        candidates (list[ValueType]): list of candidate values for the cell
-        pencilmarks (list[ValueType]): list of pencilmark values for the cell
+    属性:
+        row (int): 行の位置（1から始まる）
+        col (int): 列の位置（1から始まる）
+        value (ValueType): セル内の主要な値
+        candidates (list[ValueType]): セルの候補値のリスト
+        pencilmarks (list[ValueType]): セルのペンシルマーク値のリスト
     """
     def __init__(
         self,
         row: int, 
         col: int,
         value: ValueType = ValueType.empty,
-        candidates: list[ValueType] = None,
-        pencilmarks: list[ValueType] = None,
+        candidates: list[ValueType] | None = None,
+        pencilmarks: list[ValueType] | None = None,
     ):
         """
-        Initialize a new SudokuCell.
+        新しいSudokuCellを初期化します。
         
-        Args:
-            row: The row position (1-indexed)
-            col: The column position (1-indexed)
-            value: The primary value in the cell
-            candidates: list of candidate values for the cell
-            pencilmarks: list of pencilmark values for the cell
+        引数:
+            row: 行の位置（1から始まる）
+            col: 列の位置（1から始まる）
+            value: セル内の主要な値
+            candidates: セルの候補値のリスト
+            pencilmarks: セルのペンシルマーク値のリスト
         """
         self.row = row
         self.col = col
@@ -223,13 +219,13 @@ class SudokuCell:
 
     def __eq__(self, other: "SudokuCell") -> bool:
         """
-        Compare two SudokuCell objects for equality.
+        2つのSudokuCellオブジェクトが等しいかどうかを比較します。
         
-        Args:
-            other: Another SudokuCell to compare with
+        引数:
+            other: 比較する別のSudokuCell
             
-        Returns:
-            True if all attributes are equal, False otherwise
+        戻り値:
+            すべての属性が等しい場合はTrue、そうでない場合はFalse
         """
         if not isinstance(other, SudokuCell):
             return False
@@ -245,62 +241,56 @@ class SudokuCell:
     @classmethod
     def from_serialized(cls, row: int, col: int, cell_str: str) -> "SudokuCell":
         """
-        Create a SudokuCell from a serialized string.
+        シリアル化された文字列からSudokuCellを作成します。
         
-        Args:
-            row: The row position (1-indexed)
-            col: The column position (1-indexed)
-            cell_str: The serialized cell string
+        引数:
+            row: 行の位置（1から始まる）
+            col: 列の位置（1から始まる）
+            cell_str: シリアル化されたセル文字列
             
-        Returns:
-            A new SudokuCell instance
+        戻り値:
+            新しいSudokuCellインスタンス
         """
-        # Parse the cell string
         slash_parts = cell_str.split("/")
         slash_parts += [""] * (6 - len(slash_parts))
-        v_str = slash_parts[0].strip()  # Value
-        c_str = slash_parts[1].strip()  # Candidates
-        pm_str = slash_parts[2].strip()  # Pencilmarks
-        co_str = slash_parts[3].strip()  # Colors
-        hl_str = slash_parts[4].strip()  # Highlights
-        pe_str = slash_parts[5].strip()  # Pen marks
+        v_str = slash_parts[0].strip()  # 値
+        c_str = slash_parts[1].strip()  # 候補
+        pm_str = slash_parts[2].strip()  # ペンシルマーク
+        co_str = slash_parts[3].strip()  # 色
+        hl_str = slash_parts[4].strip()  # ハイライト
+        pe_str = slash_parts[5].strip()  # ペンマーク
 
-        # Value
         value = ValueType("." if v_str == "" else v_str)
-        # Candidates
         candidates = [ValueType(v) for v in c_str.split(",") if v]
-        # Pencilmarks
         pencilmarks = [ValueType(v) for v in pm_str.split(",") if v]
 
-        # Ignore other parts for now (colors, highlights, pen marks)
 
         return cls(row, col, value, candidates, pencilmarks)
 
     @classmethod
     def from_token_string(cls, cell_str: str) -> "SudokuCell":
         """
-        Create a SudokuCell from a string of tokens.
+        トークン文字列からSudokuCellを作成します。
         
-        Args:
-            cell_str: A string containing tokens that represent the cell
+        引数:
+            cell_str: セルを表すトークンを含む文字列
             
-        Returns:
-            A new SudokuCell instance
+        戻り値:
+            新しいSudokuCellインスタンス
             
-        Raises:
-            ValueError: If the token format is invalid
+        例外:
+            ValueError: トークン形式が無効な場合
         """
-        # Split the cell string
         parts = cell_str.split(":")
         if len(parts) != 2:
-            raise ValueError(f"Invalid cell token string: {cell_str}")
+            raise ValueError(f"無効なセルトークン文字列: {cell_str}")
             
         rc_token = parts[0]
         other_tokens = parts[1]
         
         token_parts = other_tokens.split("/")
         if len(token_parts) < 3:
-            raise ValueError(f"Invalid cell token parts: {other_tokens}")
+            raise ValueError(f"無効なセルトークン部分: {other_tokens}")
             
         v_token = token_parts[0]
         c_tokens = token_parts[1]
@@ -309,66 +299,53 @@ class SudokuCell:
         c_tokens = re.findall(r"(<value.+?>)", c_tokens)
         pm_tokens = re.findall(r"(<value.+?>)", pm_tokens)
 
-        # Parse the row and column
         row, col = token_to_coord(rc_token)
-        # Parse the value token
         value = ValueType(token_to_value(v_token))
-        # Parse the candidate tokens
         candidates = [ValueType(token_to_value(token)) for token in c_tokens]
-        # Parse the pencilmark tokens
         pencilmarks = [ValueType(token_to_value(token)) for token in pm_tokens]
 
         return cls(row, col, value, candidates, pencilmarks)
 
     def to_serialized(self) -> str:
         """
-        Convert the cell state to a serialized string.
+        セルの状態をシリアル化された文字列に変換します。
         
-        Returns:
-            A serialized representation of the cell
+        戻り値:
+            セルのシリアル化された表現
         """
-        # Cell value
         v_str = "" if self.value == ValueType.empty else self.value.value
-        # Cell candidates
         c_str = ",".join([x.value for x in sorted(self.candidates)])
-        # Cell pencilmarks
         pm_str = ",".join([x.value for x in sorted(self.pencilmarks)])
 
-        # Format the cell string
         cell_string = f"{v_str}/{c_str}/{pm_str}"
 
         return cell_string
 
     def to_token_string(self, combine_position: bool = False) -> str:
         """
-        Convert the cell state to a string of tokens.
+        セルの状態をトークン文字列に変換します。
         
-        Args:
-            combine_position: Whether to combine row and column into one token
+        引数:
+            combine_position: 行と列を1つのトークンに結合するかどうか
             
-        Returns:
-            A string representation of the cell using tokens
+        戻り値:
+            トークンを使用したセルの文字列表現
         """
-        # Cell coordinates
         rc_token = coord_to_token(self.row, self.col, combine_position)
-        # Cell value
         v_token = value_to_token(self.value.value)
-        # Cell candidates
         c_token = "".join([value_to_token(v.value) for v in sorted(self.candidates)])
-        # Cell pencilmarks
         pm_token = "".join([value_to_token(v.value) for v in sorted(self.pencilmarks)])
 
-        # Format the cell string
         cell_string = f"{rc_token}:{v_token}/{c_token}/{pm_token}"
 
         return cell_string
 
     def is_empty(self) -> bool:
         """
-        Check if the cell is empty (no value set).
+        セルが空（値が設定されていない）かどうかを確認します。
         
-        Returns:
-            True if the cell has no value, False otherwise
+        戻り値:
+            セルに値がない場合はTrue、それ以外の場合はFalse
         """
         return self.value == ValueType.empty
 
@@ -386,7 +363,7 @@ class SudokuBoard:
         cells (list[SudokuCell]): list of all cells in the board
         cell_map (dict[Tuple[int, int], SudokuCell]): dictionary mapping (row, col) to cells for quick access
     """
-    def __init__(self, rows: int, cols: int, cells: list[SudokuCell] = None, givens: dict = None):
+    def __init__(self, rows: int, cols: int, cells: list[SudokuCell] | None = None, givens: dict | None = None):
         """
         Initialize a new SudokuBoard.
         
@@ -423,7 +400,7 @@ class SudokuBoard:
         )
         
     @classmethod
-    def from_serialized(cls, serialized_state: str, rows: int, cols: int, givens: dict = None) -> "SudokuBoard":
+    def from_serialized(cls, serialized_state: str, rows: int, cols: int, givens: dict | None = None) -> "SudokuBoard":
         """
         Create a SudokuBoard from the JSON string and puzzle metadata.
         
@@ -671,7 +648,10 @@ class SudokuBoard:
                     f"Cell {row}x{col} already has a value: {cell.value.value}"
                 )
                 
-            cell.value = action.value
+            if action.value is not None:
+                cell.value = action.value
+            else:
+                raise ValueError(f"Error in executing action: {action}. Value cannot be None.")
             
         elif action.action_type == ActionType.PENCILMARK:
             if not action.coordinates:
@@ -684,6 +664,9 @@ class SudokuBoard:
                 cell = self.get_cell(row, col)
                 
                 if action.operation == OperationType.ADD:
+                    if action.value is None:
+                        raise ValueError(f"Error in executing action: {action}. Value cannot be None.")
+                        
                     if action.value not in cell.pencilmarks:
                         cell.pencilmarks.append(action.value)
                     else:
@@ -693,6 +676,9 @@ class SudokuBoard:
                         )
                     
                 elif action.operation == OperationType.REMOVE:
+                    if action.value is None:
+                        raise ValueError(f"Error in executing action: {action}. Value cannot be None.")
+                        
                     if action.value in cell.pencilmarks:
                         cell.pencilmarks.remove(action.value)
                     else:
@@ -712,6 +698,9 @@ class SudokuBoard:
                 cell = self.get_cell(row, col)
                 
                 if action.operation == OperationType.ADD:
+                    if action.value is None:
+                        raise ValueError(f"Error in executing action: {action}. Value cannot be None.")
+                        
                     if action.value not in cell.candidates:
                         cell.candidates.append(action.value)
                     else:
@@ -721,6 +710,9 @@ class SudokuBoard:
                         )
                     
                 elif action.operation == OperationType.REMOVE:
+                    if action.value is None:
+                        raise ValueError(f"Error in executing action: {action}. Value cannot be None.")
+                        
                     if action.value in cell.candidates:
                         cell.candidates.remove(action.value)
                     else:
@@ -768,6 +760,10 @@ class SudokuBoard:
                     cell.pencilmarks = []
                     cell.candidates = []
                 else:
+                    # action.valueがNoneでないことを確認
+                    if action.value is None:
+                        raise ValueError(f"Error in executing action: {action}. Value cannot be None.")
+                        
                     raise ValueError(
                         f"Error in executing action: {action}. "
                         f"Invalid clear action value: {action.value.value}"
@@ -801,7 +797,7 @@ class SudokuAction:
         operation: Optional[OperationType] = None,
         value: Optional[ValueType] = None,
         color: Optional[ColorType] = None,
-        coordinates: list[Tuple[int, int]] = None,
+        coordinates: list[Tuple[int, int]] | None = None,
         use_all: bool = False
     ):
         """
@@ -1115,6 +1111,10 @@ class SudokuAction:
             # Handle value actions - need to select, set value, deselect
             for row, col in sorted(self.coordinates):
                 coord = f"r{row}c{col}"
+                # self.valueがNoneでないことを確認
+                if self.value is None:
+                    raise ValueError(f"Error in creating sudokupad actions: Value cannot be None.")
+                    
                 sp_actions = [
                     f"sl:{coord}/1",
                     f"vl:{self.value.value}/1",
@@ -1126,6 +1126,10 @@ class SudokuAction:
             # Handle pencilmark, candidate, and color actions
             for row, col in sorted(self.coordinates):
                 coord = f"r{row}c{col}"
+                # self.valueがNoneでないことを確認
+                if self.value is None:
+                    raise ValueError(f"Error in creating sudokupad actions: Value cannot be None.")
+                    
                 sp_actions = [
                     f"sl:{coord}/1",
                     f"{self.action_type.value}:{self.value.value}/1",
@@ -1137,6 +1141,10 @@ class SudokuAction:
             # Handle clear actions
             for row, col in sorted(self.coordinates):
                 coord = f"r{row}c{col}"
+                # self.valueがNoneでないことを確認
+                if self.value is None:
+                    raise ValueError(f"Error in creating sudokupad actions: Value cannot be None.")
+                    
                 sp_actions = [
                     f"sl:{coord}/1",
                     f"{self.action_type.value}:{self.value.value}/1",

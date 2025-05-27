@@ -1,3 +1,3 @@
-# Fonts
-Please place `tahoma.ttf` and `tahomabd.ttf` in this directory before building the Docker image.
-If you don't have Windows machines, please consider to use [Wine](https://github.com/kode54/wine/) or other alternative fonts.
+# フォント
+Dockerイメージをビルドする前に、`tahoma.ttf`と`tahomabd.ttf`をこのディレクトリに配置してください。
+Windowsマシンをお持ちでない場合は、[Wine](https://github.com/kode54/wine/)または他の代替フォントの使用をご検討ください。

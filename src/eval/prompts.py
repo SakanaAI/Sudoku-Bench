@@ -1,293 +1,254 @@
-SINGLE_STEP_STANDARD_PROMPT = """You are a professional Sudoku puzzle solver.
+SINGLE_STEP_STANDARD_PROMPT = """あなたはプロの数独パズルソルバーです。
 
-## Single-step game rules ##
-- We will provide you with the current state of a standard Sudoku puzzle.
-- You will then provide a single placement for a cell that you are confident about.
-- We will solve the puzzle after many steps and interactions, but your goal for each response is to provide a single placement.
-- You may reason through the necessary logic in order to make a placement.
-- If a cell placement is incorrect the game will be aborted.
+- 標準的な数独パズルの現在の状態を提供します。
+- あなたは自信を持って配置できるマスに1つの数字を入力します。
+- 多くのステップと対話を経てパズルを解きますが、各応答の目標は1つのマスに数字を配置することです。
+- 配置するために必要な論理を考えることができます。
+- マスの配置が間違っている場合、ゲームは中止されます。
 
-## Tips ##
-- If the current board state is mostly empty you may need to make use of advanced Sudoku solving techniques.
-- If the current board state is mostly filled, then the next placement may be easy (e.g. a naked single).
-- Therefore, you are welcome to take as short or as long as you need to make a single placement, as long as you are confident in the correctness of the placement.
+- 現在のボード状態がほとんど空の場合は、高度な数独解法テクニックを使用する必要があるかもしれません。
+- 現在のボード状態がほとんど埋まっている場合、次の配置は簡単かもしれません（例：ネイキッドシングル）。
+- したがって、配置の正確さに自信がある限り、1つの配置をするために必要な時間をかけることができます。
 
-## Standard Sudoku Rules ##
-- Each row must contain the digits 1 through 9 exactly once.
-- Each column must contain the digits 1 through 9 exactly once.
-- Each 3x3 sub-grid (box) must contain the digits 1 through 9 exactly once.
+- 各行には1から9までの数字がそれぞれ1回だけ含まれる必要があります。
+- 各列には1から9までの数字がそれぞれ1回だけ含まれる必要があります。
+- 各3x3のサブグリッド（ボックス）には1から9までの数字がそれぞれ1回だけ含まれる必要があります。
 
-## Format Explanation ##
-Coordinates:
-- We will use r{x}c{y} coordinates. For example, r1c1 is the top-left cell at row 1 column 1, r1c2 is the cell to the right at row 1 column 2, r2c1 is the cell below at row 2 column 1, and so on.
+座標：
+- r{x}c{y}座標を使用します。例えば、r1c1は左上のマス（行1列1）、r1c2はその右のマス（行1列2）、r2c1はその下のマス（行2列1）などです。
 
-## Answer Format ##
-In order to make progress on the puzzle, you must answer by providing a value to any currently empty cells.
+パズルを進めるには、現在空いているマスに値を入力する必要があります。
 
-Put your answer within tags <ANSWER></ANSWER>. For example, if you wanted to place a 5 in r1c1, you would respond with
+回答は<ANSWER></ANSWER>タグ内に入れてください。例えば、r1c1に5を配置したい場合は、以下のように回答します：
 <ANSWER>
 r1c1: 5
 </ANSWER>
-at the very end of your response.
+回答の最後に記入してください。
 
-You only need to make a single placement in your response, as long as you are confident that the placement is correct.
+配置が正しいと確信している限り、回答では1つのマスへの配置だけを行えば十分です。
 """.strip()
 
-MULTI_STEP_STANDARD_PROMPT = """You are a professional Sudoku puzzle solver.
+MULTI_STEP_STANDARD_PROMPT = """あなたはプロの数独パズルソルバーです。
 
-## Game Format ##
-- We will provide you with the current state of a standard Sudoku puzzle.
-- You will then provide at least one placement for a cell that you are confident about.
-- You are welcome to make as many placements as you want, as long as you are confident in the correctness of the placement(s).
-- We will solve the puzzle after many steps and interactions. Your goal for each response is to provide at least one placement.
-- You may reason through the necessary logic in order to make a placement.
-- If any cell placement is incorrect the game will be aborted.
+- 標準的な数独パズルの現在の状態を提供します。
+- あなたは自信を持って配置できるマスに少なくとも1つの数字を入力します。
+- 配置の正確さに自信がある限り、好きなだけ多くの配置を行うことができます。
+- 多くのステップと対話を経てパズルを解きます。各応答の目標は、少なくとも1つのマスに数字を配置することです。
+- 配置するために必要な論理を考えることができます。
+- いずれかのマスの配置が間違っている場合、ゲームは中止されます。
 
-## Tips ##
-- If the current board state is mostly empty you may need to make use of advanced Sudoku solving techniques.
-- If the current board state is mostly filled, then the next placement may be easy (e.g. a naked single).
-- Therefore, you are welcome to take as short or as long as you need to make a single placement, as long as you are confident in the correctness of the placement.
+- 現在のボード状態がほとんど空の場合は、高度な数独解法テクニックを使用する必要があるかもしれません。
+- 現在のボード状態がほとんど埋まっている場合、次の配置は簡単かもしれません（例：ネイキッドシングル）。
+- したがって、配置の正確さに自信がある限り、1つの配置をするために必要な時間をかけることができます。
 
-## Standard Sudoku Rules ##
-- Each row must contain the digits 1 through 9 exactly once.
-- Each column must contain the digits 1 through 9 exactly once.
-- Each 3x3 sub-grid (box) must contain the digits 1 through 9 exactly once.
+- 各行には1から9までの数字がそれぞれ1回だけ含まれる必要があります。
+- 各列には1から9までの数字がそれぞれ1回だけ含まれる必要があります。
+- 各3x3のサブグリッド（ボックス）には1から9までの数字がそれぞれ1回だけ含まれる必要があります。
 
-## Answer Format ##
-In order to make progress on the puzzle, you must answer by providing a value to any currently empty cells.
+パズルを進めるには、現在空いているマスに値を入力する必要があります。
 
-For each cell placement you wish to commit, please provide your move within tags <ANSWER></ANSWER>.
+コミットしたい各マスの配置について、<ANSWER></ANSWER>タグ内に移動を記入してください。
 
-For example, suppose you deduce a single placement for r1c1, you would respond with
+例えば、r1c1に5を配置すると推論した場合、以下のように回答します：
 
 <ANSWER>
 r1c1: 5
 </ANSWER>
 
-Suppose you deduce that both r1c1 is 5 and r1c2 is 6, you would respond with
+r1c1が5でr1c2が6であると推論した場合、以下のように回答します：
 
 <ANSWER>
 r1c1: 5
 r1c2: 6
 </ANSWER>
 
-Please provide the list of (at least one) cell placements at the end of your response.
+回答の最後に（少なくとも1つの）マスの配置リストを提供してください。
 """.strip()
 
-SINGLE_STEP_VARIANT_PROMPT = """You are a professional Sudoku puzzle solver. 
+SINGLE_STEP_VARIANT_PROMPT = """あなたはプロの数独パズルソルバーです。
 
-## Format Explanation ##
-Coordinates:
-- We will use r{x}c{y} coordinates. For example, r1c1 is the top-left cell at row 1 column 1, r1c2 is the cell to the right at row 1 column 2, r2c1 is the cell below at row 2 column 1, and so on.
+座標：
+- r{x}c{y}座標を使用します。例えば、r1c1は左上のマス（行1列1）、r1c2はその右のマス（行1列2）、r2c1はその下のマス（行2列1）などです。
 
-Visual Elements:
-- Any visual elements will be described in text using rxcy coordinates.
-- Please note the visual elements will be described as-is. If a thermo or arrow appears on the board, the location of the circle or bulb will be listed, and the line or arrow will be listed as a separate object. But you can infer they are part of the same object by their coordinates.
-- If a visual element is described as "between" two cells, it means the visual element appears on the edge between the two cells.
-- In some puzzles there may be visual elements outside of the grid and these will be described using the same coordinate system. For example an arrow in r0c1 pointing to the lower right means there is an arrow above r1c1 that points in the direction of the diagonal: r1c2, r2c3, etc.
+視覚的要素：
+- すべての視覚的要素はrxcy座標を使用してテキストで説明されます。
+- 視覚的要素はそのまま説明されることに注意してください。サーモや矢印がボード上に表示される場合、円や電球の位置が記載され、線や矢印は別のオブジェクトとして記載されます。しかし、座標によって同じオブジェクトの一部であることを推測できます。
+- 視覚的要素が2つのマスの「間」にあると説明されている場合、その視覚的要素は2つのマスの間の辺に表示されていることを意味します。
+- 一部のパズルでは、グリッドの外側に視覚的要素がある場合があり、これらも同じ座標系を使用して説明されます。例えば、r0c1の右下を指す矢印は、r1c1の上にある矢印が対角線方向（r1c2、r2c3など）を指していることを意味します。
 
-## Tips ##
-- In solving the puzzle it often helps to understand that there exists a unique solution.
-- It therefore helps to focus on what values must be forced given the puzzle constraints, and given the fact that the solution is unique.
-- All information is provided and is sufficient to solve the puzzle.
-- If the current board state is mostly empty you may need to make use of advanced Sudoku solving techniques.
-- If the current board state is mostly filled, then the next placement may be easy (e.g. a naked single).
-- Therefore, you are welcome to take as short or as long as you need to make a single placement, as long as you are confident in the correctness of the placement.
-- Please pay close attention to the variant rules and visual components.
+- パズルを解く際には、一意の解が存在することを理解すると役立つことがよくあります。
+- したがって、パズルの制約と解が一意であるという事実を考慮して、どの値が強制されるかに焦点を当てると役立ちます。
+- すべての情報が提供されており、パズルを解くのに十分です。
+- 現在のボード状態がほとんど空の場合は、高度な数独解法テクニックを使用する必要があるかもしれません。
+- 現在のボード状態がほとんど埋まっている場合、次の配置は簡単かもしれません（例：ネイキッドシングル）。
+- したがって、配置の正確さに自信がある限り、1つの配置をするために必要な時間をかけることができます。
+- バリアントルールと視覚的要素に注意を払ってください。
 
-## Size ## 
 {{rows}} x {{cols}}
 
-## Rules ##
 {{rules}}
 
-## Visual Elements ##
 {{pretty_visual_elements}}
 
-## Answer Format ##
-In order to make progress on the puzzle, you must answer by providing a value to any currently empty cells.
+パズルを進めるには、現在空いているマスに値を入力する必要があります。
 
-Put your answer within tags <ANSWER></ANSWER>. For example, if you wanted to place a 5 in r1c1, you would respond with
+回答は<ANSWER></ANSWER>タグ内に入れてください。例えば、r1c1に5を配置したい場合は、以下のように回答します：
 <ANSWER>
 r1c1: 5
 </ANSWER>
-at the very end of your response.
+回答の最後に記入してください。
 
-You only need to make a single placement in your response, as long as you are confident that the placement is correct.
+配置が正しいと確信している限り、回答では1つのマスへの配置だけを行えば十分です。
 """.strip()
 
-MULTI_STEP_VARIANT_PROMPT = """You are a professional Sudoku puzzle solver. 
+MULTI_STEP_VARIANT_PROMPT = """あなたはプロの数独パズルソルバーです。
 
-## Format Explanation ##
-Coordinates:
-- We will use r{x}c{y} coordinates. For example, r1c1 is the top-left cell at row 1 column 1, r1c2 is the cell to the right at row 1 column 2, r2c1 is the cell below at row 2 column 1, and so on.
+座標：
+- r{x}c{y}座標を使用します。例えば、r1c1は左上のマス（行1列1）、r1c2はその右のマス（行1列2）、r2c1はその下のマス（行2列1）などです。
 
-Visual Elements:
-- Any visual elements will be described in text using rxcy coordinates.
-- Please note the visual elements will be described as-is. If a thermo or arrow appears on the board, the location of the circle or bulb will be listed, and the line or arrow will be listed as a separate object. But you can infer they are part of the same object by their coordinates.
-- If a visual element is described as "between" two cells, it means the visual element appears on the edge between the two cells.
-- In some puzzles there may be visual elements outside of the grid and these will be described using the same coordinate system. For example an arrow in r0c1 pointing to the lower right means there is an arrow above r1c1 that points in the direction of the diagonal: r1c2, r2c3, etc.
+視覚的要素：
+- すべての視覚的要素はrxcy座標を使用してテキストで説明されます。
+- 視覚的要素はそのまま説明されることに注意してください。サーモや矢印がボード上に表示される場合、円や電球の位置が記載され、線や矢印は別のオブジェクトとして記載されます。しかし、座標によって同じオブジェクトの一部であることを推測できます。
+- 視覚的要素が2つのマスの「間」にあると説明されている場合、その視覚的要素は2つのマスの間の辺に表示されていることを意味します。
+- 一部のパズルでは、グリッドの外側に視覚的要素がある場合があり、これらも同じ座標系を使用して説明されます。例えば、r0c1の右下を指す矢印は、r1c1の上にある矢印が対角線方向（r1c2、r2c3など）を指していることを意味します。
 
-## Tips ##
-- In solving the puzzle it often helps to understand that there exists a unique solution.
-- It therefore helps to focus on what values must be forced given the puzzle constraints, and given the fact that the solution is unique.
-- All information is provided and is sufficient to solve the puzzle.
-- If the current board state is mostly empty you may need to make use of advanced Sudoku solving techniques.
-- If the current board state is mostly filled, then the next placement may be easy (e.g. a naked single).
-- Therefore, you are welcome to take as short or as long as you need to make a single placement, as long as you are confident in the correctness of the placement.
-- Please pay close attention to the variant rules and visual components.
+- パズルを解く際には、一意の解が存在することを理解すると役立つことがよくあります。
+- したがって、パズルの制約と解が一意であるという事実を考慮して、どの値が強制されるかに焦点を当てると役立ちます。
+- すべての情報が提供されており、パズルを解くのに十分です。
+- 現在のボード状態がほとんど空の場合は、高度な数独解法テクニックを使用する必要があるかもしれません。
+- 現在のボード状態がほとんど埋まっている場合、次の配置は簡単かもしれません（例：ネイキッドシングル）。
+- したがって、配置の正確さに自信がある限り、1つの配置をするために必要な時間をかけることができます。
+- バリアントルールと視覚的要素に注意を払ってください。
 
-## Size ## 
 {{rows}} x {{cols}}
 
-## Rules ##
 {{rules}}
 
-## Visual Elements ##
 {{pretty_visual_elements}}
 
-## Answer Format ##
-In order to make progress on the puzzle, you must answer by providing a value to any currently empty cells.
+パズルを進めるには、現在空いているマスに値を入力する必要があります。
 
-For each cell placement you wish to commit, please provide your move within tags <ANSWER></ANSWER>.
+コミットしたい各マスの配置について、<ANSWER></ANSWER>タグ内に移動を記入してください。
 
-For example, suppose you deduce a single placement for r1c1, you would respond with
+例えば、r1c1に5を配置すると推論した場合、以下のように回答します：
 
 <ANSWER>
 r1c1: 5
 </ANSWER>
 
-Suppose you deduce that both r1c1 is 5 and r1c2 is 6, you would respond with
+r1c1が5でr1c2が6であると推論した場合、以下のように回答します：
 
 <ANSWER>
 r1c1: 5
 r1c2: 6
 </ANSWER>
 
-Please provide the list of (at least one) cell placements at the end of your response.
+回答の最後に（少なくとも1つの）マスの配置リストを提供してください。
 """.strip()
 
-ONE_SHOT_STANDARD_PROMPT = """You are a professional Sudoku puzzle solver. Please solve the following Sudoku puzzle.
+ONE_SHOT_STANDARD_PROMPT = """あなたはプロの数独パズルソルバーです。以下の数独パズルを解いてください。
 
-## Standard Sudoku Rules ##
-- Each row must contain the digits 1 through 9 exactly once.
-- Each column must contain the digits 1 through 9 exactly once.
-- Each 3x3 sub-grid (box) must contain the digits 1 through 9 exactly once.
+- 各行には1から9までの数字がそれぞれ1回だけ含まれる必要があります。
+- 各列には1から9までの数字がそれぞれ1回だけ含まれる必要があります。
+- 各3x3のサブグリッド（ボックス）には1から9までの数字がそれぞれ1回だけ含まれる必要があります。
 
-## Initial Sudoku Board ##
 {{current_board}}
 
-## Answer Format ##
-Please provide your answer at the end of your response. Put your answer within tags <ANSWER></ANSWER>. Your answer will be a sequence of {{rows}}x{{cols}} = {{ rows * cols }} digits.
+回答は応答の最後に提供してください。回答は<ANSWER></ANSWER>タグ内に入れてください。回答は{{rows}}x{{cols}} = {{ rows * cols }}桁の数字の並びになります。
 
-For example, the format should look like
+例えば、形式は以下のようになります：
 <ANSWER>
 1234567...
 </ANSWER>
 """.strip()
 
-ONE_SHOT_VARIANT_PROMPT = """You are a professional Sudoku puzzle solver. Please solve the following Sudoku variant.
+ONE_SHOT_VARIANT_PROMPT = """あなたはプロの数独パズルソルバーです。以下の数独バリアントを解いてください。
 
-## Format Explanation ##
-Coordinates:
-- We will use r{x}c{y} coordinates. For example, r1c1 is the top-left cell at row 1 column 1, r1c2 is the cell to the right at row 1 column 2, r2c1 is the cell below at row 2 column 1, and so on.
+座標：
+- r{x}c{y}座標を使用します。例えば、r1c1は左上のマス（行1列1）、r1c2はその右のマス（行1列2）、r2c1はその下のマス（行2列1）などです。
 
-Visual Elements:
-- Any visual elements will be described in text using rxcy coordinates.
-- Please note the visual elements will be described as-is. If a thermo or arrow appears on the board, the location of the circle or bulb will be listed, and the line or arrow will be listed as a separate object. But you can infer they are part of the same object by their coordinates.
-- If a visual element is described as "between" two cells, it means the visual element appears on the edge between the two cells.
-- In some puzzles there may be visual elements outside of the grid and these will be described using the same coordinate system. For example an arrow in r0c1 pointing to the lower right means there is an arrow above r1c1 that points in the direction of the diagonal: r1c2, r2c3, etc.
+視覚的要素：
+- すべての視覚的要素はrxcy座標を使用してテキストで説明されます。
+- 視覚的要素はそのまま説明されることに注意してください。サーモや矢印がボード上に表示される場合、円や電球の位置が記載され、線や矢印は別のオブジェクトとして記載されます。しかし、座標によって同じオブジェクトの一部であることを推測できます。
+- 視覚的要素が2つのマスの「間」にあると説明されている場合、その視覚的要素は2つのマスの間の辺に表示されていることを意味します。
+- 一部のパズルでは、グリッドの外側に視覚的要素がある場合があり、これらも同じ座標系を使用して説明されます。例えば、r0c1の右下を指す矢印は、r1c1の上にある矢印が対角線方向（r1c2、r2c3など）を指していることを意味します。
 
-## Tips ##
-- In solving the puzzle it often helps to understand that there exists a unique solution.
-- It therefore helps to focus on what values must be forced given the puzzle constraints, and given the fact that the solution is unique.
-- All information is provided and is sufficient to solve the puzzle.
+- パズルを解く際には、一意の解が存在することを理解すると役立つことがよくあります。
+- したがって、パズルの制約と解が一意であるという事実を考慮して、どの値が強制されるかに焦点を当てると役立ちます。
+- すべての情報が提供されており、パズルを解くのに十分です。
 
-## Size ## 
 {{rows}} x {{cols}}
 
-## Rules ##
 {{rules}}
 
-## Visual Elements ##
 {{pretty_visual_elements}}
 
-## Initial Sudoku Board ##
 {{current_board}}
 
-## Answer Format ##
-Please provide your answer at the end of your response. Put your answer within tags <ANSWER></ANSWER>. Your answer will be a sequence of {{rows}}x{{cols}} = {{ rows * cols }} digits.
+回答は応答の最後に提供してください。回答は<ANSWER></ANSWER>タグ内に入れてください。回答は{{rows}}x{{cols}} = {{ rows * cols }}桁の数字の並びになります。
 
-For example, the format should look like
+例えば、形式は以下のようになります：
 <ANSWER>
 1234567...
 </ANSWER>
 """.strip()
 
 PREFILLED_ASSISTANT_RESPONSE = """
-I'm ready to help solve this Sudoku puzzle! I'll analyze the board carefully using logical deduction techniques and constraint propagation to find definite placements.
+この数独パズルを解くお手伝いをします！論理的な推論テクニックと制約伝播を使用して、確実な配置を見つけるためにボードを注意深く分析します。
 
-For each step, I'll:
-1. Examine the current board state
-2. Apply Sudoku solving techniques (naked singles, hidden singles, etc.)
-3. Identify cells with definite values
-4. Provide clear reasoning for my placement
+各ステップでは以下を行います：
+1. 現在のボード状態を調べる
+2. 数独解法テクニック（ネイキッドシングル、ヒドゥンシングルなど）を適用する
+3. 確定値を持つマスを特定する
+4. 配置の明確な理由を提供する
 
-When I find a definite value for a cell, I'll provide my answer in the required format:
+マスの確定値を見つけたら、必要な形式で回答を提供します：
 <ANSWER>
 rXcY: Z
 </ANSWER>
 
-Let's begin when you share the puzzle board!
+パズルボードが共有されたら始めましょう！
 """.strip()
 
 BOARD_PROMPT = """
-## Current Board ##
 {{current_board}}
 """.strip()
 
-ONE_SHOT_PROMPT = """You are a professional Sudoku puzzle solver. Please solve the following Sudoku variant.
+ONE_SHOT_PROMPT = """あなたはプロの数独パズルソルバーです。以下の数独バリアントを解いてください。
 
-## Format Explanation ##
-Coordinates:
-- We will use r{x}c{y} coordinates. For example, r1c1 is the top-left cell at row 1 column 1, r1c2 is the cell to the right at row 1 column 2, r2c1 is the cell below at row 2 column 1, and so on.
+座標：
+- r{x}c{y}座標を使用します。例えば、r1c1は左上のマス（行1列1）、r1c2はその右のマス（行1列2）、r2c1はその下のマス（行2列1）などです。
 {%- if pretty_visual_elements %}
 
-Visual Elements:
-- Any visual elements will be described in text using rxcy coordinates.
-- Please note the visual elements will be described as-is. If a thermo or arrow appears on the board, the location of the circle or bulb will be listed, and the line or arrow will be listed as a separate object. But you can infer they are part of the same object by their coordinates.
-- If a visual element is described as "between" two cells, it means the visual element appears on the edge between the two cells.
-- In some puzzles there may be visual elements outside of the grid and these will be described using the same coordinate system. For example an arrow in r0c1 pointing to the lower right means there is an arrow above r1c1 that points in the direction of the diagonal: r1c2, r2c3, etc.
-- All visual elements are provided and provides sufficient information to solve the puzzle.
+視覚的要素：
+- すべての視覚的要素はrxcy座標を使用してテキストで説明されます。
+- 視覚的要素はそのまま説明されることに注意してください。サーモや矢印がボード上に表示される場合、円や電球の位置が記載され、線や矢印は別のオブジェクトとして記載されます。しかし、座標によって同じオブジェクトの一部であることを推測できます。
+- 視覚的要素が2つのマスの「間」にあると説明されている場合、その視覚的要素は2つのマスの間の辺に表示されていることを意味します。
+- 一部のパズルでは、グリッドの外側に視覚的要素がある場合があり、これらも同じ座標系を使用して説明されます。例えば、r0c1の右下を指す矢印は、r1c1の上にある矢印が対角線方向（r1c2、r2c3など）を指していることを意味します。
+- すべての視覚的要素が提供されており、パズルを解くのに十分な情報が含まれています。
 {%- endif %}
 
-## Tips ##
-In solving the puzzle it often helps to understand that there exists a unique solution.
-It therefore helps to focus on what values must be forced given the puzzle constraints, and given the fact that the solution is unique.
-You should try to commit a single value to a cell.
+パズルを解く際には、一意の解が存在することを理解すると役立つことがよくあります。
+したがって、パズルの制約と解が一意であるという事実を考慮して、どの値が強制されるかに焦点を当てると役立ちます。
+1つのマスに1つの値を確定させるようにしてください。
 
-## Size ## 
 {{rows}} x {{cols}}
 
-## Rules ##
 {{rules}}
 {%- if pretty_visual_elements %}
 
-## Visual Elements ##
 {{pretty_visual_elements}}
 {%- endif %}
 
-## Current Board ##
 {{current_board}}
 
-## Answer Format ##
-Please provide your answer at the end of your response. Put your answer within tags <ANSWER></ANSWER>. Your answer will be a sequence of {{rows}}x{{cols}} = {{ rows * cols }} digits.
+回答は応答の最後に提供してください。回答は<ANSWER></ANSWER>タグ内に入れてください。回答は{{rows}}x{{cols}} = {{ rows * cols }}桁の数字の並びになります。
 
-For example, if the solution is 1234, your answer will be:
+例えば、解が1234の場合、回答は以下のようになります：
 <ANSWER>
 1234
 </ANSWER>
 
 """.strip()
 
-# ONE_SHOT_PROMPT_NO_TOOLS = ONE_SHOT_PROMPT + """\nDo not use any tools. Do not use python or javascript or any code. Do not search the web."""
+# ONE_SHOT_PROMPT_NO_TOOLS = ONE_SHOT_PROMPT + """\nツールを使用しないでください。Pythonやjavascriptなどのコードを使用しないでください。ウェブ検索をしないでください。"""

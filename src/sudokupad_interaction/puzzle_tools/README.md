@@ -1,21 +1,21 @@
-# SudokuPad Puzzle Tools
+# SudokuPadパズルツール
 
-This directory contains tools for converting puzzle data from SudokuPad's format into a structured puzzle representation.
+このディレクトリには、SudokuPadのフォーマットからパズルデータを構造化された形式に変換するためのツールが含まれています。
 
-## Extracting Puzzle Data
+## パズルデータの抽出
 
-The primary utility is `extract_puzzle_from_sudokupad` in [`sudokupad_to_puzzle.py`](sudokupad_to_puzzle.py), which returns a dictionary containing the following puzzle data:
-- `puzzle_id`: The ID of the puzzle
-- `author`: The author of the puzzle
-- `title`: The title of the puzzle
-- `rules`: The rules of the puzzle as a structured JSON string
-- `initial_board`: The initial board state as a simple string representation
-- `solution`: The solution to the puzzle
-- `rows`: The number of rows in the puzzle
-- `cols`: The number of columns in the puzzle
-- `visual_elements`: The visual elements of the puzzle (lines, arrows, cages, overlays, etc.)
+主要なユーティリティは[`sudokupad_to_puzzle.py`](sudokupad_to_puzzle.py)の`extract_puzzle_from_sudokupad`関数で、以下のパズルデータを含む辞書を返します：
+- `puzzle_id`：パズルのID
+- `author`：パズルの作者
+- `title`：パズルのタイトル
+- `rules`：構造化されたJSON文字列としてのパズルのルール
+- `initial_board`：シンプルな文字列表現としての初期盤面
+- `solution`：パズルの解答
+- `rows`：パズルの行数
+- `cols`：パズルの列数
+- `visual_elements`：パズルのビジュアル要素（線、矢印、ケージ、オーバーレイなど）
 
-## Example Usage
+## 使用例
 
 ```python
 from sudokupad_interaction.app import load_sudokupad, WINDOW_WIDTH, WINDOW_HEIGHT
@@ -25,15 +25,15 @@ from pprint import pprint
 
 url = "https://sudokupad.app/i9jmywmume"
 
-encoded_puzzle = fetch_puzzle(url.split("sudokupad.app/")[1])  # Returns encoded puzzle
-driver = load_sudokupad(encoded_puzzle, WINDOW_WIDTH, WINDOW_HEIGHT)  # Loads the puzzle in an offline browser
+encoded_puzzle = fetch_puzzle(url.split("sudokupad.app/")[1])  # エンコードされたパズルを取得
+driver = load_sudokupad(encoded_puzzle, WINDOW_WIDTH, WINDOW_HEIGHT)  # オフラインブラウザでパズルを読み込む
 puzzle_data = extract_puzzle_from_sudokupad(driver)
 driver.quit()
 
 pprint(puzzle_data)
 ```
 
-Or to `pprint` into terminal:
+または、ターミナルに`pprint`で出力する場合：
 ```bash
 python sudokupad_to_puzzle.py --sudokupad-url https://sudokupad.app/i9jmywmume
 ```

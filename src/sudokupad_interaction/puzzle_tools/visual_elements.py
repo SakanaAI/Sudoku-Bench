@@ -1,5 +1,5 @@
 """
-SudokuPad Visual Elements Extraction Utility
+SudokuPadビジュアル要素抽出ユーティリティ
 """
 import json
 import copy
@@ -8,8 +8,6 @@ from typing import Optional, Tuple
 import matplotlib.colors as mcolors
 
 
-# Standard region definitions for 9x9, 6x6, 4x4 puzzles
-# These constants define the standard box regions for different puzzle sizes
 SOURCE_PUZZLE_REGIONS_9X9 = '[[[0, 0], [0, 1], [0, 2], [1, 0], [1, 1], [1, 2], [2, 0], [2, 1], [2, 2]], [[0, 3], [0, 4], [0, 5], [1, 3], [1, 4], [1, 5], [2, 3], [2, 4], [2, 5]], [[0, 6], [0, 7], [0, 8], [1, 6], [1, 7], [1, 8], [2, 6], [2, 7], [2, 8]], [[3, 0], [3, 1], [3, 2], [4, 0], [4, 1], [4, 2], [5, 0], [5, 1], [5, 2]], [[3, 3], [3, 4], [3, 5], [4, 3], [4, 4], [4, 5], [5, 3], [5, 4], [5, 5]], [[3, 6], [3, 7], [3, 8], [4, 6], [4, 7], [4, 8], [5, 6], [5, 7], [5, 8]], [[6, 0], [6, 1], [6, 2], [7, 0], [7, 1], [7, 2], [8, 0], [8, 1], [8, 2]], [[6, 3], [6, 4], [6, 5], [7, 3], [7, 4], [7, 5], [8, 3], [8, 4], [8, 5]], [[6, 6], [6, 7], [6, 8], [7, 6], [7, 7], [7, 8], [8, 6], [8, 7], [8, 8]]]'
 CURRENT_PUZZLE_CAGES_9X9 = '[{"cells": "r1c1,r1c2,r1c3,r2c1,r2c2,r2c3,r3c1,r3c2,r3c3", "sum": 45, "unique": true, "style": "box", "type": "region"}, {"cells": "r1c4,r1c5,r1c6,r2c4,r2c5,r2c6,r3c4,r3c5,r3c6", "sum": 45, "unique": true, "style": "box", "type": "region"}, {"cells": "r1c7,r1c8,r1c9,r2c7,r2c8,r2c9,r3c7,r3c8,r3c9", "sum": 45, "unique": true, "style": "box", "type": "region"}, {"cells": "r4c1,r4c2,r4c3,r5c1,r5c2,r5c3,r6c1,r6c2,r6c3", "sum": 45, "unique": true, "style": "box", "type": "region"}, {"cells": "r4c4,r4c5,r4c6,r5c4,r5c5,r5c6,r6c4,r6c5,r6c6", "sum": 45, "unique": true, "style": "box", "type": "region"}, {"cells": "r4c7,r4c8,r4c9,r5c7,r5c8,r5c9,r6c7,r6c8,r6c9", "sum": 45, "unique": true, "style": "box", "type": "region"}, {"cells": "r7c1,r7c2,r7c3,r8c1,r8c2,r8c3,r9c1,r9c2,r9c3", "sum": 45, "unique": true, "style": "box", "type": "region"}, {"cells": "r7c4,r7c5,r7c6,r8c4,r8c5,r8c6,r9c4,r9c5,r9c6", "sum": 45, "unique": true, "style": "box", "type": "region"}, {"cells": "r7c7,r7c8,r7c9,r8c7,r8c8,r8c9,r9c7,r9c8,r9c9", "sum": 45, "unique": true, "style": "box", "type": "region"}, {"cells": "r1c1-r1c9", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r2c1-r2c9", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r3c1-r3c9", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r4c1-r4c9", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r5c1-r5c9", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r6c1-r6c9", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r7c1-r7c9", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r8c1-r8c9", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r9c1-r9c9", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r1c1-r9c1", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r1c2-r9c2", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r1c3-r9c3", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r1c4-r9c4", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r1c5-r9c5", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r1c6-r9c6", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r1c7-r9c7", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r1c8-r9c8", "sum": 45, "unique": true, "type": "rowcol"}, {"cells": "r1c9-r9c9", "sum": 45, "unique": true, "type": "rowcol"}]'
 
@@ -20,29 +18,27 @@ SOURCE_PUZZLE_REGIONS_4X4 = '[[[0, 0], [0, 1], [1, 0], [1, 1]], [[0, 2], [0, 3],
 CURRENT_PUZZLE_CAGES_4X4 = '[{"cells": "r1c1,r1c2,r2c1,r2c2", "sum": 10, "unique": true, "style": "box", "type": "region"}, {"cells": "r1c3,r1c4,r2c3,r2c4", "sum": 10, "unique": true, "style": "box", "type": "region"}, {"cells": "r3c1,r3c2,r4c1,r4c2", "sum": 10, "unique": true, "style": "box", "type": "region"}, {"cells": "r3c3,r3c4,r4c3,r4c4", "sum": 10, "unique": true, "style": "box", "type": "region"}, {"cells": "r1c1-r1c4", "sum": 10, "unique": true, "type": "rowcol"}, {"cells": "r2c1-r2c4", "sum": 10, "unique": true, "type": "rowcol"}, {"cells": "r3c1-r3c4", "sum": 10, "unique": true, "type": "rowcol"}, {"cells": "r4c1-r4c4", "sum": 10, "unique": true, "type": "rowcol"}, {"cells": "r1c1-r4c1", "sum": 10, "unique": true, "type": "rowcol"}, {"cells": "r1c2-r4c2", "sum": 10, "unique": true, "type": "rowcol"}, {"cells": "r1c3-r4c3", "sum": 10, "unique": true, "type": "rowcol"}, {"cells": "r1c4-r4c4", "sum": 10, "unique": true, "type": "rowcol"}]'
 
 ######################
-## Color Conversion ##
 ###################### 
 
-# Precompute CSS4 color names mapped to RGB tuples (normalized floats)
 CSS4_RGB = {name: mcolors.to_rgb(hex_code) for name, hex_code in mcolors.CSS4_COLORS.items()}
 
 def hex_to_rgb(hex_code: str) -> Optional[Tuple[float, float, float]]:
     """
-    Convert a hex color code to an RGB tuple of floats in [0,1].
+    16進数カラーコードをRGBタプル（[0,1]の浮動小数点）に変換します。
     
-    Supports shorthand (e.g., "#abc" or "#abcd") and full length
-    (e.g., "#aabbcc" or "#aabbccdd"). Any alpha channel is dropped.
+    短縮形（例：「#abc」または「#abcd」）と完全形式
+    （例：「#aabbcc」または「#aabbccdd」）をサポートします。アルファチャンネルは無視されます。
     
-    Args:
-        hex_code: A string containing a hex color code
+    引数:
+        hex_code: 16進数カラーコードを含む文字列
         
-    Returns:
-        A tuple of three float values representing RGB values, or None if conversion fails
+    戻り値:
+        RGB値を表す3つの浮動小数点値のタプル、または変換に失敗した場合はNone
     """
     hex_code = hex_code.strip().lstrip('#')
     if len(hex_code) in (3, 4):
         hex_code = ''.join(c * 2 for c in hex_code)
-    if len(hex_code) == 8:  # assume RGBA; ignore alpha
+    if len(hex_code) == 8:  # RGBAと仮定し、アルファを無視
         hex_code = hex_code[:6]
     try:
         return mcolors.to_rgb("#" + hex_code)
@@ -51,13 +47,13 @@ def hex_to_rgb(hex_code: str) -> Optional[Tuple[float, float, float]]:
 
 def rgb_to_name(rgb: Optional[Tuple[float, float, float]]) -> Optional[str]:
     """
-    Return the name of the CSS4 color that best approximates the given RGB tuple.
+    指定されたRGBタプルに最も近いCSS4色の名前を返します。
     
-    Args:
-        rgb: A tuple of three float values representing RGB values
+    引数:
+        rgb: RGB値を表す3つの浮動小数点値のタプル
         
-    Returns:
-        The name of the closest CSS4 color, or None if rgb is None
+    戻り値:
+        最も近いCSS4色の名前、またはrgbがNoneの場合はNone
     """
     if rgb is None:
         return None
@@ -66,32 +62,31 @@ def rgb_to_name(rgb: Optional[Tuple[float, float, float]]) -> Optional[str]:
 
 def hex_to_color_name(hex_code: str) -> str:
     """
-    Convert a hex color code to the closest CSS4 color name.
+    16進数カラーコードを最も近いCSS4色名に変換します。
     
-    Args:
-        hex_code: A string containing a hex color code
+    引数:
+        hex_code: 16進数カラーコードを含む文字列
         
-    Returns:
-        The name of the closest CSS4 color or the original hex code if conversion fails
+    戻り値:
+        最も近いCSS4色の名前、または変換に失敗した場合は元の16進数コード
     """
     rgb = hex_to_rgb(hex_code)
     return rgb_to_name(rgb) or hex_code
 
 
 ##########################################
-## Sudokupad visual elements extraction ##
 ##########################################
 
 def get_lines_or_arrows(source_puzzle, type="lines"):
     """
-    Extract lines or arrows from source puzzle, converting waypoints to cell-based coordinates.
+    ソースパズルから線または矢印を抽出し、ウェイポイントをセルベースの座標に変換します。
     
-    Args:
-        source_puzzle: The puzzle data structure
-        type: The type of element to extract ("lines" or "arrows")
+    引数:
+        source_puzzle: パズルデータ構造
+        type: 抽出する要素のタイプ（「lines」または「arrows」）
         
-    Returns:
-        A list of extracted line/arrow elements with their properties
+    戻り値:
+        プロパティを含む抽出された線/矢印要素のリスト
     """
     # Constants for detection logic
     EDGE_EPS = 0.35  # How close to an integer boundary we consider "on the border"
@@ -313,15 +308,15 @@ def get_lines_or_arrows(source_puzzle, type="lines"):
 
 def get_cages(current_puzzle, rows, cols):
     """
-    Extract any 'killer cages' that are not the standard boxes or row/col definitions.
+    標準的なボックスや行/列の定義ではない「キラーケージ」を抽出します。
     
-    Args:
-        current_puzzle: The current puzzle data structure
-        rows: Number of rows in the puzzle
-        cols: Number of columns in the puzzle
+    引数:
+        current_puzzle: 現在のパズルデータ構造
+        rows: パズルの行数
+        cols: パズルの列数
         
-    Returns:
-        A list of non-standard cages in the puzzle
+    戻り値:
+        パズル内の非標準ケージのリスト
     """
     if rows == 9 and cols == 9:
         standard_cages = json.loads(CURRENT_PUZZLE_CAGES_9X9)
@@ -334,18 +329,14 @@ def get_cages(current_puzzle, rows, cols):
     
     cages = []
     for cage in current_puzzle.get('cages', []):
-        # Simplify cage by removing 'parsedCells' key
         c_simplified = {k: v for k, v in cage.items() if k != 'parsedCells'}
         
-        # Skip if standard
         if c_simplified in standard_cages:
             continue
         
-        # Skip if cage is entire puzzle
         if len(c_simplified['cells'].split(',')) == rows * cols:
             continue
         
-        # Skip if cage is empty
         if c_simplified['cells'] == '':
             continue
         
@@ -362,15 +353,15 @@ def get_cages(current_puzzle, rows, cols):
 
 def get_regions(source_puzzle, rows, cols):
     """
-    Extract any custom regions not in standard definitions.
+    標準定義にない任意のカスタム領域を抽出します。
     
-    Args:
-        source_puzzle: The puzzle data structure
-        rows: Number of rows in the puzzle
-        cols: Number of columns in the puzzle
+    引数:
+        source_puzzle: パズルデータ構造
+        rows: パズルの行数
+        cols: パズルの列数
         
-    Returns:
-        A list of non-standard regions in the puzzle
+    戻り値:
+        パズル内の非標準領域のリスト
     """
     if rows == 9 and cols == 9:
         standard_regions = json.loads(SOURCE_PUZZLE_REGIONS_9X9)
@@ -396,14 +387,14 @@ def get_regions(source_puzzle, rows, cols):
 
 def get_underlays_or_overlays(source_puzzle, type="underlays"):
     """
-    Extract underlay or overlay elements from source puzzle.
+    ソースパズルからアンダーレイまたはオーバーレイ要素を抽出します。
     
-    Args:
-        source_puzzle: The puzzle data structure
-        type: The type of element to extract ("underlays" or "overlays")
+    引数:
+        source_puzzle: パズルデータ構造
+        type: 抽出する要素のタイプ（「underlays」または「overlays」）
         
-    Returns:
-        A list of extracted underlay/overlay elements with their properties
+    戻り値:
+        プロパティを含む抽出されたアンダーレイ/オーバーレイ要素のリスト
     """
     items = []
     for item in source_puzzle.get(type, []):
@@ -485,13 +476,13 @@ def get_underlays_or_overlays(source_puzzle, type="underlays"):
 
 def get_global_constraints(source_puzzle):
     """
-    Extract global constraints (like anti-knight, anti-king, etc.) from metadata.
+    メタデータからグローバル制約（アンチナイト、アンチキングなど）を抽出します。
     
-    Args:
-        source_puzzle: The puzzle data structure
+    引数:
+        source_puzzle: パズルデータ構造
         
-    Returns:
-        A list of global constraints defined in the puzzle
+    戻り値:
+        パズルで定義されたグローバル制約のリスト
     """
     global_constraints = []
     metadata = source_puzzle.get('metadata', {})
@@ -505,16 +496,16 @@ def get_global_constraints(source_puzzle):
 
 def extract_visual_elements(source_puzzle, current_puzzle, rows, cols):
     """
-    Gather all puzzle constraints in a single list.
+    すべてのパズル制約を単一のリストにまとめます。
     
-    Args:
-        source_puzzle: The source puzzle data structure
-        current_puzzle: The current puzzle data structure
-        rows: Number of rows in the puzzle
-        cols: Number of columns in the puzzle
+    引数:
+        source_puzzle: ソースパズルデータ構造
+        current_puzzle: 現在のパズルデータ構造
+        rows: パズルの行数
+        cols: パズルの列数
         
-    Returns:
-        A list of all visual elements in the puzzle
+    戻り値:
+        パズル内のすべてのビジュアル要素のリスト
     """
     visual_elements = []
     visual_elements.extend(get_cages(current_puzzle, rows, cols))

@@ -16,13 +16,10 @@ from selenium.webdriver.support.ui import WebDriverWait
 import uvicorn
 
 
-# Size of the browser window
 WINDOW_WIDTH, WINDOW_HEIGHT = 1920, 1200
 
-# Path to the SudokuPad files
 SUDOKUPAD_PATH = Path(__file__).resolve().parent / "sudoku_pad"
 
-# Simon's custom color palette
 SIMON_COLORS = {
     "colors": {
         "0": "transparent",
@@ -65,54 +62,53 @@ SIMON_COLORS = {
 
 
 @enum.unique
-class Operation(enum.Enum):
+class Operation(str, enum.Enum):
     """
-    The operation of the cell.
+    セルの操作を表す列挙型。
 
-    Attributes:
-    SELECT (str): The select operation.
-    DESELECT (str): The deselect operation.
-    VALUE (str): The value operation.
-    PENCILMARKS (str): The pencilmarks operation.
-    CANDIDATES (str): The candidates operation.
-    COLOUR (str): The colour operation.
-    PEN (str): The pen operation.
-    PENCOLOR (str): The pencolor operation.
-    CLEAR (str): The clear operation.
-    UNDO (str): The undo operation.
-    REDO (str): The redo operation.
-    GROUPSTART (str): The groupstart operation.
-    GROUPEND (str): The groupend operation.
-    UNPAUSE (str): The unpause operation.
-    WAIT (str): The wait operation.
-    RESET (str): The reset operation.
-    NOOP (str): The no operation operation.
+    属性:
+    SELECT (str): セル選択操作。
+    DESELECT (str): セル選択解除操作。
+    VALUE (str): 値入力操作。
+    PENCILMARKS (str): ペンシルマーク（隅のメモ）操作。
+    CANDIDATES (str): 候補数字（中央のメモ）操作。
+    COLOR (str): セルの色付け操作。
+    PEN (str): ペン描画操作。
+    PENCOLOR (str): ペンの色選択操作。
+    CLEAR (str): 消去操作。
+    UNDO (str): 元に戻す操作。
+    REDO (str): やり直し操作。
+    GROUPSTART (str): グループ開始操作。
+    GROUPEND (str): グループ終了操作。
+    UNPAUSE (str): 一時停止解除操作。
+    WAIT (str): 待機操作。
+    RESET (str): リセット操作。
     """
-    SELECT: str = "sl"
-    DESELECT: str = "ds"
-    VALUE: str = "vl"
-    PENCILMARKS: str = "pm"
-    CANDIDATES: str = "cd"
-    COLOR: str = "co"
-    PEN: str = "pe"
-    PENCOLOR: str = "pc"
-    CLEAR: str = "cl"
-    UNDO: str = "ud"
-    REDO: str = "rd"
-    GROUPSTART: str = "gs"
-    GROUPEND: str = "ge"
-    UNPAUSE: str = "up"
-    WAIT: str = "wt"
-    RESET: str = "rs"  # NOTE: This operation is not used in the web application.
+    SELECT = "sl"
+    DESELECT = "ds"
+    VALUE = "vl"
+    PENCILMARKS = "pm"
+    CANDIDATES = "cd"
+    COLOR = "co"
+    PEN = "pe"
+    PENCOLOR = "pc"
+    CLEAR = "cl"
+    UNDO = "ud"
+    REDO = "rd"
+    GROUPSTART = "gs"
+    GROUPEND = "ge"
+    UNPAUSE = "up"
+    WAIT = "wt"
+    RESET = "rs"  # 注意: この操作はウェブアプリケーションでは使用されていません。
 
 
 class BaseAction(BaseModel):
     """
-    The base action.
+    すべてのアクションの基底クラス。
 
-    Attributes:
-    operation (Operation): The operation.
-    time_delta (int): The time delta.
+    属性:
+    operation (Operation): 実行する操作の種類。
+    time_delta (int): 操作間の時間間隔（ミリ秒）。
     """
     operation: Operation
     time_delta: int = 1
@@ -121,54 +117,54 @@ class BaseAction(BaseModel):
     @classmethod
     def validate_time_delta(cls, time_delta: int) -> int:
         if time_delta < 0:
-            raise ValueError("The time_delta must be non-negative.")
+            raise ValueError("time_deltaは負の値にできません。")
         return time_delta
 
     @classmethod
     def import_command(cls, command: str) -> "BaseAction":
         """
-        Import the action from a tuple.
+        文字列形式のコマンドからアクションオブジェクトを生成します。
 
-        Args:
-        command (str): The action.
+        引数:
+        command (str): コマンド文字列。
 
-        Returns:
-        BaseAction: The action.
+        戻り値:
+        BaseAction: 生成されたアクションオブジェクト。
         """
-        raise NotImplementedError("The import_command method must be implemented in the subclass.")
+        raise NotImplementedError("import_commandメソッドはサブクラスで実装する必要があります。")
 
     def export_command(self) -> str:
         """
-        Convert the action to a string.
+        アクションオブジェクトをウェブアプリケーション用の文字列形式に変換します。
 
-        Returns:
-        str: The action command in the format of the web application.
+        戻り値:
+        str: ウェブアプリケーション形式のコマンド文字列。
         """
-        raise NotImplementedError("The export_command method must be implemented in the subclass.")
+        raise NotImplementedError("export_commandメソッドはサブクラスで実装する必要があります。")
 
     @staticmethod
     def convert_cells_tuple(cells: list[tuple[int, int]]) -> str:
         """
-        Convert the cells to a string.
+        セル座標のリストを文字列形式に変換します。
 
-        Args:
-        cells (list[tuple[int, int]]): The cells.
+        引数:
+        cells (list[tuple[int, int]]): セル座標のリスト（0ベース）。
 
-        Returns:
-        str: The string of the cells.
+        戻り値:
+        str: 「r1c1r2c2...」形式のセル座標文字列（1ベース）。
         """
         return "".join([f"r{cell[0] + 1}c{cell[1] + 1}" for cell in cells])
 
     @staticmethod
     def convert_cells_str(cells: str) -> list[tuple[int, int]]:
         """
-        Convert the cells to a list.
+        「r1c1r2c2...」形式のセル座標文字列をタプルのリストに変換します。
 
-        Args:
-        cells (str): The cells.
+        引数:
+        cells (str): セル座標文字列（1ベース）。
 
-        Returns:
-        list[tuple[int, int]]: The list of the cells.
+        戻り値:
+        list[tuple[int, int]]: セル座標のリスト（0ベース）。
         """
         return [(int(cell.group(1)) - 1, int(cell.group(2)) - 1) for cell in re.finditer(r"r(\d+)c(\d+)", cells)]
 
@@ -255,26 +251,26 @@ class ValueAction(BaseAction):
 
 class ColorAction(BaseAction):
     """
-    The color action.
+    セルに色を付けるアクション。
 
-    Attributes:
-    color (str): The color.
+    属性:
+    color (str): 色を表す文字（0, 1, 2, ..., 9, a, b, ..., t）。
     """
     operation: Operation = Operation.COLOR
-    color: str  # color should be str (0, 1, 2, ..., 9, a, b, ..., t).
+    color: str  # 色は文字列（0, 1, 2, ..., 9, a, b, ..., t）で指定
 
     @field_validator("operation")
     @classmethod
     def validate_operation(cls, operation: Operation) -> Operation:
         if operation != Operation.COLOR:
-            raise ValueError("The operation must be color.")
+            raise ValueError("操作はCOLORである必要があります。")
         return operation
 
     @field_validator("color")
     @classmethod
-    def validate_color(cls, color: str) -> int:
+    def validate_color(cls, color: str) -> str:
         if len(color) != 1 or color not in "0123456789abcdefghijklmnopqrst":
-            raise ValueError("The color must be a single character from 0 to t.")
+            raise ValueError("色は0からtまでの1文字である必要があります。")
         return color
 
     @classmethod
@@ -293,46 +289,46 @@ class ColorAction(BaseAction):
 
 class PenAction(BaseAction):
     """
-    The pen action.
+    ペンで線や記号を描くアクション。
 
-    This action is used with groupstart/pencolor/select/pen/deselect/groupend actions.
-    [action list]
-        0: All clear
-        1: Line to the right cell
-        2: Line to the bottom cell
-        3: `x` mark on the right edge
-        4: `x` mark on the bottom edge
-        5: `o` mark in the cell
-        6: `x` mark on the cell
-        7: Line the right edge
-        8: Line the bottom edge
-        9: Line the left edge
-        a: Line the top edge
-        b: `x` mark on the left edge
-        c: `x` mark on the top edge
-        d: Line to the top-right cell
-        e: Line to the bottom-right cell
-        f: Line from the top-right corner to the bottom-left corner in the cell
-        g: Line from the top-left corner to the bottom-right corner in the cell
+    このアクションはgroupstart/pencolor/select/pen/deselect/groupendアクションと組み合わせて使用されます。
+    [アクション一覧]
+        0: すべて消去
+        1: 右のセルへの線
+        2: 下のセルへの線
+        3: 右辺に「x」マーク
+        4: 下辺に「x」マーク
+        5: セル内に「o」マーク
+        6: セル内に「x」マーク
+        7: 右辺に線
+        8: 下辺に線
+        9: 左辺に線
+        a: 上辺に線
+        b: 左辺に「x」マーク
+        c: 上辺に「x」マーク
+        d: 右上のセルへの線
+        e: 右下のセルへの線
+        f: セル内の右上から左下への対角線
+        g: セル内の左上から右下への対角線
 
-    Attributes:
-    shape (str): The shape of the pen.
+    属性:
+    shape (str): ペンの形状を表す文字。
     """
     operation: Operation = Operation.PEN
-    shape: str  # shape should be str (0, 1, 2, ..., 9, a, b, ..., g).
+    shape: str  # 形状は文字列（0, 1, 2, ..., 9, a, b, ..., g）で指定
 
     @field_validator("operation")
     @classmethod
     def validate_operation(cls, operation: Operation) -> Operation:
         if operation != Operation.PEN:
-            raise ValueError("The operation must be pen.")
+            raise ValueError("操作はPENである必要があります。")
         return operation
 
     @field_validator("shape")
     @classmethod
-    def validate_shape(cls, shape: str) -> int:
+    def validate_shape(cls, shape: str) -> str:
         if len(shape) != 1 or shape not in "0123456789abcdefg":
-            raise ValueError("The shape must be a single character from 0 to g.")
+            raise ValueError("形状は0からgまでの1文字である必要があります。")
         return shape
 
     @classmethod
@@ -351,26 +347,26 @@ class PenAction(BaseAction):
 
 class PencolorAction(BaseAction):
     """
-    The pencolor action.
+    ペンの色を選択するアクション。
 
-    Attributes:
-    color (str): The color.
+    属性:
+    color (str): ペンの色を表す文字（1, 2, ..., 9）。
     """
     operation: Operation = Operation.PENCOLOR
-    color: str  # color should be str (1, 2, ..., 9).
+    color: str  # 色は文字列（1, 2, ..., 9）で指定
 
     @field_validator("operation")
     @classmethod
     def validate_operation(cls, operation: Operation) -> Operation:
         if operation != Operation.PENCOLOR:
-            raise ValueError("The operation must be pencolor.")
+            raise ValueError("操作はPENCOLORである必要があります。")
         return operation
 
     @field_validator("color")
     @classmethod
-    def validate_color(cls, color: str) -> int:
+    def validate_color(cls, color: str) -> str:
         if len(color) != 1 or color not in "123456789":
-            raise ValueError("The color must be a single character from 1 to 9.")
+            raise ValueError("色は1から9までの1文字である必要があります。")
         return color
 
     @classmethod
@@ -389,31 +385,31 @@ class PencolorAction(BaseAction):
 
 class ClearAction(BaseAction):
     """
-    The clear action.
-    [level] Clear if there is a renderedValue (at least one of the selected cells)
-        0: value -> candidates -> pencilmarks -> color -> pen
-        1: pencilmarks -> value -> candidates -> color -> pen
-        2: candidates -> value -> pencilmarks -> color -> pen
-        3: color -> value -> candidates -> pencilmarks -> pen
+    セルの内容を消去するアクション。
+    [レベル] 選択されたセルの少なくとも1つに表示値がある場合に消去します
+        0: 値 -> 候補数字 -> ペンシルマーク -> 色 -> ペン
+        1: ペンシルマーク -> 値 -> 候補数字 -> 色 -> ペン
+        2: 候補数字 -> 値 -> ペンシルマーク -> 色 -> ペン
+        3: 色 -> 値 -> 候補数字 -> ペンシルマーク -> ペン
 
-    Attributes:
-    level (str): The level of the clear.
+    属性:
+    level (str): 消去のレベルを表す文字。
     """
     operation: Operation = Operation.CLEAR
-    level: str  # level should be str (0, 1, 2, 3).
+    level: str  # レベルは文字列（0, 1, 2, 3）で指定
 
     @field_validator("operation")
     @classmethod
     def validate_operation(cls, operation: Operation) -> Operation:
         if operation != Operation.CLEAR:
-            raise ValueError("The operation must be clear.")
+            raise ValueError("操作はCLEARである必要があります。")
         return operation
 
     @field_validator("level")
     @classmethod
-    def validate_level(cls, level: str) -> int:
+    def validate_level(cls, level: str) -> str:
         if len(level) != 1 or level not in "0123":
-            raise ValueError("The level must be a single character from 0 to 3.")
+            raise ValueError("レベルは0から3までの1文字である必要があります。")
         return level
 
     @classmethod
@@ -432,7 +428,7 @@ class ClearAction(BaseAction):
 
 class UndoAction(BaseAction):
     """
-    The undo action.
+    元に戻すアクション。
     """
     operation: Operation = Operation.UNDO
 
@@ -440,7 +436,7 @@ class UndoAction(BaseAction):
     @classmethod
     def validate_operation(cls, operation: Operation) -> Operation:
         if operation != Operation.UNDO:
-            raise ValueError("The operation must be undo.")
+            raise ValueError("操作はUNDOである必要があります。")
         return operation
 
     @classmethod
@@ -457,7 +453,7 @@ class UndoAction(BaseAction):
 
 class RedoAction(BaseAction):
     """
-    The redo action.
+    やり直しアクション。
     """
     operation: Operation = Operation.REDO
 
@@ -465,7 +461,7 @@ class RedoAction(BaseAction):
     @classmethod
     def validate_operation(cls, operation: Operation) -> Operation:
         if operation != Operation.REDO:
-            raise ValueError("The operation must be redo.")
+            raise ValueError("操作はREDOである必要があります。")
         return operation
 
     @classmethod
@@ -482,13 +478,14 @@ class RedoAction(BaseAction):
 
 class GroupAction(BaseAction):
     """
-    The groupstart/groupend action.
+    グループ開始/終了アクション。
+    複数のアクションをグループ化するために使用されます。
     """
     @field_validator("operation")
     @classmethod
     def validate_operation(cls, operation: Operation) -> Operation:
         if operation != Operation.GROUPSTART and operation != Operation.GROUPEND:
-            raise ValueError("The operation must be groupstart or groupend.")
+            raise ValueError("操作はGROUPSTARTまたはGROUPENDである必要があります。")
         return operation
 
     @classmethod
@@ -505,7 +502,10 @@ class GroupAction(BaseAction):
 
 class PauseAction(BaseAction):
     """
-    The unpause/wait action.
+    一時停止解除/待機アクション。
+    
+    属性:
+    value (int | None): 待機時間（ミリ秒）。UNPAUSEの場合はNone。
     """
     value: int | None = None
 
@@ -513,7 +513,7 @@ class PauseAction(BaseAction):
     @classmethod
     def validate_operation(cls, operation: Operation) -> Operation:
         if operation != Operation.UNPAUSE and operation != Operation.WAIT:
-            raise ValueError("The operation must be unpause or wait.")
+            raise ValueError("操作はUNPAUSEまたはWAITである必要があります。")
         return operation
 
     @classmethod
@@ -535,10 +535,11 @@ class PauseAction(BaseAction):
 
 class ResetAction(BaseAction):
     """
-    The reset action.
+    リセットアクション。
+    パズルを初期状態に戻します。
 
-    Attributes:
-    operation (Operation): The operation.
+    属性:
+    operation (Operation): 実行する操作の種類。
     """
     operation: Operation = Operation.RESET
 
@@ -546,7 +547,7 @@ class ResetAction(BaseAction):
     @classmethod
     def validate_operation(cls, operation: Operation) -> Operation:
         if operation != Operation.RESET:
-            raise ValueError("The operation must be reset.")
+            raise ValueError("操作はRESETである必要があります。")
         return operation
 
     @classmethod
@@ -563,14 +564,11 @@ class ResetAction(BaseAction):
 
 def wait_for_sudokupad(driver: webdriver.Chrome, timeout: int = 15) -> None:
     """
-    Wait for SudokuPad to fully load all components.
-    Raises TimeoutException on failure.
+    SudokuPadのすべてのコンポーネントが完全に読み込まれるのを待ちます。
+    読み込みに失敗した場合はTimeoutExceptionを発生させます。
     """
-    # 1) Wait for DOM to be 'complete'
     WebDriverWait(driver, timeout).until(lambda d: d.execute_script("return document.readyState") == "complete")
-    # 2) Wait for puzzle container
     WebDriverWait(driver, timeout).until(EC.presence_of_element_located((By.CSS_SELECTOR, ".app .cells .row .cell")))
-    # 3) Wait until we can do Framework.app.addTool
     def add_tool_ready(_drv: webdriver.Chrome) -> bool:
         try:
             _drv.execute_script(
@@ -583,76 +581,68 @@ def wait_for_sudokupad(driver: webdriver.Chrome, timeout: int = 15) -> None:
 
     WebDriverWait(driver, timeout).until(add_tool_ready)
 
-    # 4) Wait until puzzle.id is non-empty.
     def puzzle_has_id(_drv: webdriver.Chrome) -> bool:
         puzzle_check_js = """
         if (!Framework || !Framework.app || !Framework.app.puzzle || !Framework.app.puzzle.currentPuzzle) {
             return null;
         }
         const p = Framework.app.puzzle.currentPuzzle;
-        // if puzzle.id is missing or empty string
+        // puzzle.idが存在しないか空文字列の場合
         if (!p.id) {
             return null;
         }
-        return p.id;  // Return the puzzle ID string
+        return p.id;  // パズルIDの文字列を返す
         """
         val = _drv.execute_script(puzzle_check_js)
-        return bool(val)  # anything non-empty is success
+        return bool(val)  # 空でない値は成功とみなす
 
     WebDriverWait(driver, timeout).until(puzzle_has_id)
 
 
 def load_sudokupad(encoded_puzzle: str, window_width: int, window_height: int, **kwargs) -> webdriver.Chrome:
     """
-    Load the webapp from the given URL.
+    指定されたURLからウェブアプリを読み込みます。
 
-    Args:
-        encoded_puzzle (str): The string that represents the puzzle (Not shortened ID).
-        window_width (int): Width of the browser window.
-        window_height (int): Height of the browser window.
-        **kwargs: Additional arguments to be passed to the webdriver.
+    引数:
+        encoded_puzzle (str): パズルを表す文字列（短縮IDではない）。
+        window_width (int): ブラウザウィンドウの幅。
+        window_height (int): ブラウザウィンドウの高さ。
+        **kwargs: webdriverに渡される追加の引数。
 
-    Returns:
-        webdriver.Chrome: Selenium webdriver
+    戻り値:
+        webdriver.Chrome: Seleniumのwebdriverインスタンス
     """
-    # Set up the Chrome options
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--disable-font-subpixel-positioning")
-    options.add_argument("--disable-font-antialiasing")
-    options.add_argument("--disable-lcd-text")
-    options.add_argument("--disable-skia-runtime-opts")
-    options.add_argument("--force-device-scale-factor=1")
-    options.add_argument("--high-dpi-support=1")
-    options.add_argument(f"--window-size={window_width},{window_height}")
-    # Initialize the webdriver
+    options.add_argument("--headless")  # ヘッドレスモード
+    options.add_argument("--no-sandbox")  # サンドボックスを無効化
+    options.add_argument("--disable-dev-shm-usage")  # 共有メモリ使用を無効化
+    options.add_argument("--disable-font-subpixel-positioning")  # フォントのサブピクセル配置を無効化
+    options.add_argument("--disable-font-antialiasing")  # フォントのアンチエイリアスを無効化
+    options.add_argument("--disable-lcd-text")  # LCD用テキストレンダリングを無効化
+    options.add_argument("--disable-skia-runtime-opts")  # Skiaランタイムオプションを無効化
+    options.add_argument("--force-device-scale-factor=1")  # デバイススケールファクターを1に固定
+    options.add_argument("--high-dpi-support=1")  # 高DPIサポートを有効化
+    options.add_argument(f"--window-size={window_width},{window_height}")  # ウィンドウサイズを設定
     driver = webdriver.Chrome(options=options)
-    # Load SudokuPad
     driver.get(f"file://{SUDOKUPAD_PATH}/index.html?puzzleid={encoded_puzzle}")
-    # Disable animations
     driver.execute_script(
         "const style = document.createElement('style');style.type = 'text/css';style.innerHTML = '* { animation: none !important; transition: none !important; }';document.head.appendChild(style);"
     )
-    # Wait for the app to load
     wait_for_sudokupad(driver)
-    # Settings
     driver.execute_script("""
-        Framework.setSetting("toolpen", true);  // Enable Pen Tool: On
-        Framework.toggleSettingClass("toolpen", true);  // Enable Pen Tool: On
-        Framework.setSetting("toolletter", true);  // Enable Letter Tool: On
-        Framework.toggleSettingClass("toolletter", true);  // Enable Letter Tool: On
-        Framework.setSetting("digitoutlines", true);  // Outlines on Elements: On
-        Framework.toggleSettingClass("digitoutlines", true);  // Outlines on Elements: On
-        Framework.setSetting("autocheck", false);  // Check on Finish: Off
-        Framework.toggleSettingClass("autocheck", false);  // Check on Finish: Off
-        Framework.setSetting("conflictchecker", "off");  // Conflict Checker: Off, Simon don't need no error checking.
-        Framework.toggleSettingClass("conflictchecker", "off");  // Conflict Checker: Off
-        Framework.features.conflictchecker.detachElem()  // Conflict Checker: Off
+        Framework.setSetting("toolpen", true);  // ペンツール: オン
+        Framework.toggleSettingClass("toolpen", true);  // ペンツール: オン
+        Framework.setSetting("toolletter", true);  // 文字ツール: オン
+        Framework.toggleSettingClass("toolletter", true);  // 文字ツール: オン
+        Framework.setSetting("digitoutlines", true);  // 要素の輪郭: オン
+        Framework.toggleSettingClass("digitoutlines", true);  // 要素の輪郭: オン
+        Framework.setSetting("autocheck", false);  // 完了時のチェック: オフ
+        Framework.toggleSettingClass("autocheck", false);  // 完了時のチェック: オフ
+        Framework.setSetting("conflictchecker", "off");  // 競合チェッカー: オフ
+        Framework.toggleSettingClass("conflictchecker", "off");  // 競合チェッカー: オフ
+        Framework.features.conflictchecker.detachElem()  // 競合チェッカー: オフ
     """)
     driver.execute_script(f"ToolColor.tool.setPalette({json.dumps(SIMON_COLORS)});")
-    # Click outside the window to dismiss the start button
     screen_width = driver.execute_script("return window.innerWidth;")
     screen_height = driver.execute_script("return window.innerHeight;")
     actions = ActionChains(driver)
@@ -662,11 +652,30 @@ def load_sudokupad(encoded_puzzle: str, window_width: int, window_height: int, *
 
 
 class WebAppAgent:
+    """
+    SudokuPadウェブアプリケーションとの対話を管理するエージェントクラス。
+    
+    このクラスはSeleniumを使用してSudokuPadアプリケーションを操作し、
+    スクリーンショットの取得、パズルの状態の保存と復元、アクションの実行などの
+    機能を提供します。
+    """
     def __init__(self, encoded_puzzle: str) -> None:
+        """
+        WebAppAgentを初期化します。
+        
+        引数:
+            encoded_puzzle (str): エンコードされたパズル文字列。
+        """
         self.encoded_puzzle = encoded_puzzle
         self._load_webapp()
 
     def take_screenshot(self) -> bytes:
+        """
+        現在のパズルボードのスクリーンショットを取得します。
+        
+        戻り値:
+            bytes: PNG形式のスクリーンショット画像データ。
+        """
         image = Image.open(BytesIO(self.driver.get_screenshot_as_png())).convert("RGB")
         image = image.resize(
             (round(image.width / self.dpr), round(image.height / self.dpr)),
@@ -680,21 +689,40 @@ class WebAppAgent:
         return bytes_buffer.getvalue()
 
     def puzzle_is_completed(self) -> bool:
+        """
+        パズルが完成しているかどうかを確認します。
+        
+        戻り値:
+            bool: パズルが完成している場合はTrue、そうでない場合はFalse。
+        """
         return self.driver.execute_script("return Framework.app.puzzle.isCompleted();")
 
     def get_serialized_state(self) -> str:
+        """
+        現在のパズル状態をシリアライズして取得します。
+        
+        戻り値:
+            str: シリアライズされたパズル状態のJSON文字列。
+        """
         json_str = self.driver.execute_script("return Framework.app.puzzle.serializeState();")
         return json_str
 
     def load_serialized_state(self, serialized_state: str) -> None:
-        self.driver.execute_script(f"Framework.app.puzzle.deserializeState({serialized_state});")  # FIXME: Why the `highlighted` cells are not restored?
+        """
+        シリアライズされたパズル状態を読み込みます。
+        
+        引数:
+            serialized_state (str): シリアライズされたパズル状態のJSON文字列。
+        """
+        self.driver.execute_script(f"Framework.app.puzzle.deserializeState({serialized_state});")  # 注意: 「highlighted」セルが復元されない理由は？
 
     def _load_webapp(self) -> None:
-        # Load the Sudokupad
+        """
+        SudokuPadウェブアプリケーションを読み込みます。
+        パズル領域の座標情報も取得します。
+        """
         self.driver = load_sudokupad(encoded_puzzle=self.encoded_puzzle, window_width=WINDOW_WIDTH, window_height=WINDOW_HEIGHT)
-        # Get the device pixel ratio
         self.dpr = self.driver.execute_script("return window.devicePixelRatio;")
-        # Load the SVG element
         svg_element = self.driver.find_element(By.ID, "svgrenderer")
         puzzle_region = self.driver.execute_script(
             r"const rect = arguments[0].getBoundingClientRect(); return {x: rect.left, y: rect.top, width: rect.width, height: rect.height};",
@@ -706,10 +734,17 @@ class WebAppAgent:
         }
 
     def _execute(self, action: BaseAction | list[BaseAction], **kwargs) -> None:
+        """
+        アクションを実行します。
+        
+        引数:
+            action (BaseAction | list[BaseAction]): 実行するアクション、またはアクションのリスト。
+            **kwargs: 追加の引数。
+        """
         if isinstance(action, list):
             for act in action:
                 self._execute(act, **kwargs)
-            return  # Execute all actions
+            return  # すべてのアクションを実行
         if isinstance(action, ResetAction):
             self.driver.execute_script("Framework.app.puzzle.restartPuzzle();")  # Framework.app.puzzle.resetPuzzle() + trigger("start")
         else:
@@ -722,15 +757,36 @@ AGENT = None
 app = FastAPI()
 @app.get("/")
 async def root() -> JSONResponse:
+    """
+    ルートエンドポイント。アプリケーションが正常に動作しているかを確認します。
+    
+    戻り値:
+        JSONResponse: 「OK」メッセージを含むレスポンス。
+    """
     return JSONResponse(content={"message": "OK"}, status_code=status.HTTP_200_OK)
 
 
 class InitData(BaseModel):
+    """
+    初期化リクエストのデータモデル。
+    
+    属性:
+        encoded_puzzle (str): エンコードされたパズル文字列。
+    """
     encoded_puzzle: str
 
 
 @app.put("/init")
 async def init(data: InitData) -> JSONResponse:
+    """
+    WebAppAgentを初期化するエンドポイント。
+    
+    引数:
+        data (InitData): エンコードされたパズル文字列を含むデータ。
+        
+    戻り値:
+        JSONResponse: 初期化結果を含むレスポンス。
+    """
     global AGENT
     try:
         AGENT = WebAppAgent(data.encoded_puzzle)
@@ -743,78 +799,114 @@ async def init(data: InitData) -> JSONResponse:
 
 @app.get("/current_state")
 async def get_current_state() -> JSONResponse:
+    """
+    現在のパズル状態を取得するエンドポイント。
+    
+    戻り値:
+        JSONResponse: 現在のパズル状態を含むレスポンス。
+    """
     if AGENT is None:
-        return JSONResponse(content={"initialized": "", "serialized_state": "", "message": "The app is not initialized."}, status_code=status.HTTP_400_BAD_REQUEST)
+        return JSONResponse(content={"initialized": "", "serialized_state": "", "message": "アプリケーションが初期化されていません。"}, status_code=status.HTTP_400_BAD_REQUEST)
     serialized_state = AGENT.get_serialized_state()
     return JSONResponse(content={"initialized": AGENT.encoded_puzzle, "serialized_state": serialized_state, "message": "Success"}, status_code=status.HTTP_200_OK)
 
 
 class SetStateData(BaseModel):
+    """
+    状態設定リクエストのデータモデル。
+    
+    属性:
+        serialized_state (str): シリアライズされたパズル状態。
+    """
     serialized_state: str
 
 
 @app.put("/set_state")
 async def set_state(data: SetStateData) -> JSONResponse:
+    """
+    パズル状態を設定するエンドポイント。
+    
+    引数:
+        data (SetStateData): シリアライズされたパズル状態を含むデータ。
+        
+    戻り値:
+        JSONResponse: 状態設定結果を含むレスポンス。
+    """
     if AGENT is None:
-        return JSONResponse(content={"initialized": "", "serialized_state": "", "message": "The app is not initialized."}, status_code=status.HTTP_400_BAD_REQUEST)
+        return JSONResponse(content={"initialized": "", "serialized_state": "", "message": "アプリケーションが初期化されていません。"}, status_code=status.HTTP_400_BAD_REQUEST)
     AGENT.load_serialized_state(data.serialized_state)
     serialized_state = AGENT.get_serialized_state()
     return JSONResponse(content={"initialized": AGENT.encoded_puzzle, "serialized_state": serialized_state, "message": "Success"}, status_code=status.HTTP_200_OK)
 
 
 class ExecuteData(BaseModel):
+    """
+    アクション実行リクエストのデータモデル。
+    
+    属性:
+        actions (list[str]): 実行するアクションのリスト。
+    """
     actions: list[str]
 
 
 @app.put("/execute")
 async def execute(data: ExecuteData) -> JSONResponse:
+    """
+    アクションを実行するエンドポイント。
+    
+    引数:
+        data (ExecuteData): 実行するアクションのリストを含むデータ。
+        
+    戻り値:
+        JSONResponse: アクション実行結果を含むレスポンス。
+    """
     if AGENT is None:
-        return JSONResponse(content={"initialized": "", "serialized_state": "", "message": "The app is not initialized."}, status_code=status.HTTP_400_BAD_REQUEST)
+        return JSONResponse(content={"initialized": "", "serialized_state": "", "message": "アプリケーションが初期化されていません。"}, status_code=status.HTTP_400_BAD_REQUEST)
     old_serialized_state = AGENT.get_serialized_state()
     parsed_actions = []
     try:
         for action in data.actions:
-            match action[:2]:  # The first two characters are the operation
-                case Operation.SELECT.value:
+            match action[:2]:  # 最初の2文字が操作を表す
+                case "sl":  # SELECT
                     parsed_actions.append(SelectAction.import_command(action))
-                case Operation.DESELECT.value:
+                case "ds":  # DESELECT
                     parsed_actions.append(SelectAction.import_command(action))
-                case Operation.VALUE.value:
+                case "vl":  # VALUE
                     parsed_actions.append(ValueAction.import_command(action))
-                case Operation.PENCILMARKS.value:
+                case "pm":  # PENCILMARKS
                     parsed_actions.append(ValueAction.import_command(action))
-                case Operation.CANDIDATES.value:
+                case "cd":  # CANDIDATES
                     parsed_actions.append(ValueAction.import_command(action))
-                case Operation.COLOR.value:
+                case "co":  # COLOR
                     parsed_actions.append(ColorAction.import_command(action))
-                case Operation.PEN.value:
+                case "pe":  # PEN
                     parsed_actions.append(PenAction.import_command(action))
-                case Operation.PENCOLOR.value:
+                case "pc":  # PENCOLOR
                     parsed_actions.append(PencolorAction.import_command(action))
-                case Operation.CLEAR.value:
+                case "cl":  # CLEAR
                     parsed_actions.append(ClearAction.import_command(action))
-                case Operation.UNDO.value:
+                case "ud":  # UNDO
                     parsed_actions.append(UndoAction.import_command(action))
-                case Operation.REDO.value:
+                case "rd":  # REDO
                     parsed_actions.append(RedoAction.import_command(action))
-                case Operation.GROUPSTART.value:
+                case "gs":  # GROUPSTART
                     parsed_actions.append(GroupAction.import_command(action))
-                case Operation.GROUPEND.value:
+                case "ge":  # GROUPEND
                     parsed_actions.append(GroupAction.import_command(action))
-                case Operation.UNPAUSE.value:
+                case "up":  # UNPAUSE
                     parsed_actions.append(PauseAction.import_command(action))
-                case Operation.WAIT.value:
+                case "wt":  # WAIT
                     parsed_actions.append(PauseAction.import_command(action))
-                case Operation.RESET.value:
+                case "rs":  # RESET
                     parsed_actions.append(ResetAction.import_command(action))
                 case _:
-                    raise ValueError(f"Invalid operation: {action[0]}")
+                    raise ValueError(f"無効な操作: {action[0]}")
     except Exception as e:
         return JSONResponse(content={"initialized": AGENT.encoded_puzzle, "serialized_state": old_serialized_state, "message": str(e)}, status_code=status.HTTP_400_BAD_REQUEST)
     try:
         AGENT._execute(parsed_actions)
     except Exception as e:
-        AGENT.load_serialized_state(old_serialized_state)  # Rollback
+        AGENT.load_serialized_state(old_serialized_state)  # ロールバック
         return JSONResponse(content={"initialized": AGENT.encoded_puzzle, "serialized_state": old_serialized_state, "message": str(e)}, status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     new_serialized_state = AGENT.get_serialized_state()
     return JSONResponse(content={"initialized": AGENT.encoded_puzzle, "serialized_state": new_serialized_state, "message": "Success"}, status_code=status.HTTP_200_OK)
@@ -822,16 +914,28 @@ async def execute(data: ExecuteData) -> JSONResponse:
 
 @app.get("/is_completed")
 async def is_completed() -> JSONResponse:
+    """
+    パズルが完成しているかどうかを確認するエンドポイント。
+    
+    戻り値:
+        JSONResponse: パズルの完成状態を含むレスポンス。
+    """
     if AGENT is None:
-        return JSONResponse(content={"message": "The app is not initialized."}, status_code=status.HTTP_400_BAD_REQUEST)
+        return JSONResponse(content={"message": "アプリケーションが初期化されていません。"}, status_code=status.HTTP_400_BAD_REQUEST)
     is_completed = AGENT.puzzle_is_completed()
     return JSONResponse(content={"is_completed": is_completed, "message": "Success"}, status_code=status.HTTP_200_OK)
 
 
 @app.get("/screenshot")
 async def get_screenshot() -> StreamingResponse:
+    """
+    現在のパズルボードのスクリーンショットを取得するエンドポイント。
+    
+    戻り値:
+        StreamingResponse: PNG形式のスクリーンショット画像。
+    """
     if AGENT is None:
-        return JSONResponse(content={"message": "The app is not initialized."}, status_code=status.HTTP_400_BAD_REQUEST)
+        return JSONResponse(content={"message": "アプリケーションが初期化されていません。"}, status_code=status.HTTP_400_BAD_REQUEST)
     screenshot = AGENT.take_screenshot()
     return StreamingResponse(BytesIO(screenshot), media_type="image/png")
 

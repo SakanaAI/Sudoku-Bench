@@ -1,129 +1,135 @@
 <h1 align="center">
-  <b>Sudoku-Bench</b><br>
+  <b>Sudoku-Bench（数独ベンチマーク）</b><br>
 </h1>
   
 <p align="center">
-  🤗 <a href="https://huggingface.co/datasets/SakanaAI/Sudoku-Bench">[Sudoku-Bench puzzle dataset]</a><br>
-  🤗 <a href="https://huggingface.co/datasets/SakanaAI/Sudoku-CTC-Reasoning">[Sudoku-CTC-Reasoning dataset]</a><br>
-  📝 <a href="https://sakana.ai/sudoku-bench">[Blog Post]</a>
+  🤗 <a href="https://huggingface.co/datasets/SakanaAI/Sudoku-Bench">[数独ベンチマークパズルデータセット]</a><br>
+  🤗 <a href="https://huggingface.co/datasets/SakanaAI/Sudoku-CTC-Reasoning">[数独CTC推論データセット]</a><br>
+  📝 <a href="https://sakana.ai/sudoku-bench">[ブログ記事]</a>
 </p>
 
-Welcome to **Sudoku-Bench** from [SakanaAI](https://sakana.ai/)
+[SakanaAI](https://sakana.ai/)が開発した**Sudoku-Bench（数独ベンチマーク）**へようこそ！
 
-| **🧩 Table of Contents 🧩** |
+| **🧩 目次 🧩** |
 | --------------------- |
-| 🐟 [Introduction](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#introduction) |
-| 🐟 [The **Sudoku-Bench** puzzle dataset](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#the-sudoku-bench-puzzle-dataset) |
-| &nbsp;&nbsp;🐡 [challenge_100 puzzle dataset](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#challenge_100-puzzle-dataset) |
-| &nbsp;&nbsp;🐡 [nikoli_100 puzzle dataset](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#nikoli_100-puzzle-dataset) |
-| &nbsp;&nbsp;🐡 [ctc puzzle dataset](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#ctc-puzzle-dataset) |
-| 🐟 [Two ways to play](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#two-ways-to-play) |
-| &nbsp;&nbsp;🐡 [Method 1: Text-only](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#method-1-text-only) |
-| &nbsp;&nbsp;🐡 [Method 2: SudokuPad app](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#method-2-sudokupad-app) |
-| 🐟 [Getting started](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#getting-started) |
-| 🐟 [Partnerships](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#partnerships) |
-| 🐟 [Citation](https://github.com/SakanaAI/Sudoku-Bench?tab=readme-ov-file#citation) |
+| 🐟 [はじめに](#はじめに) |
+| 🐟 [Sudoku-Benchとは？](#sudoku-benchとは) |
+| 🐟 [数独ベンチマークパズルデータセット](#数独ベンチマークパズルデータセット) |
+| &nbsp;&nbsp;🐡 [challenge_100パズルデータセット](#challenge_100パズルデータセット) |
+| &nbsp;&nbsp;🐡 [nikoli_100パズルデータセット](#nikoli_100パズルデータセット) |
+| &nbsp;&nbsp;🐡 [ctcパズルデータセット](#ctcパズルデータセット) |
+| 🐟 [利用方法：2つのアプローチ](#利用方法2つのアプローチ) |
+| &nbsp;&nbsp;🐡 [方法1：テキストのみ](#方法1テキストのみ) |
+| &nbsp;&nbsp;🐡 [方法2：SudokuPadアプリ](#方法2sudokupadアプリ) |
+| 🐟 [使い始める](#使い始める) |
+| 🐟 [パートナーシップ](#パートナーシップ) |
+| 🐟 [貢献について](#貢献について) |
+| 🐟 [引用](#引用) |
 
-## Introduction
+## はじめに
 
-**Sudoku-Bench** features the kind of Sudoku puzzles featured on [Cracking the Cryptic](https://www.youtube.com/c/CrackingTheCryptic) (CTC). These Sudoku variants employ unique rulesets to evoke creative problem solving, and we believe are the perfect evaluation benchmark for AI reasoning models.
+**Sudoku-Bench（数独ベンチマーク）**は、AIの推論能力を評価するための新しいベンチマークです。特に、創造的で人間らしい問題解決能力を測定することに焦点を当てています。
 
-In this repository we provide tools for interfacing with these Sudoku variants and are releasing:
+## Sudoku-Benchとは？
 
-- **The Sudoku-Bench dataset**: a new evaluation benchmark for reasoning models
-- **Baseline evaluation code**: baseline code for evaluating current LLMs in multi-turn Sudoku solving
-- **SudokuPad tools**: for interfacing with the [SudokuPad](https://sudokupad.app/) app created by [Sven Neumann](https://svencodes.com/)
-- **Cracking the Cryptic reasoning traces**: thousands of hours of reasoning traces from Cracking the Cryptic, including verbal reasoning transcripts and SudokuPad state-action sequences extracted directly from YouTube videos
+Sudoku-Benchは、[Cracking the Cryptic](https://www.youtube.com/c/CrackingTheCryptic)（CTC）で紹介されているような数独バリアント（変種数独）を特徴としています。これらの数独バリアントは独自のルールセットを採用しており、創造的な問題解決能力を引き出します。私たちは、これらがAI推論モデルを評価するための理想的なベンチマークだと考えています。
 
-## The **Sudoku-Bench** puzzle dataset
+このリポジトリでは、これらの数独バリアントと連携するためのツールを提供し、以下のものをリリースしています：
 
-The [**Sudoku-Bench**](https://huggingface.co/datasets/SakanaAI/Sudoku-Bench) puzzle dataset includes 3 subsets:
-- `challenge_100`: 100 Sudoku puzzles designed as a core benchmark for evaluating reasoning models
-- `nikoli_100`: 100 handmade standard Sudoku puzzles offered by [Nikoli](https://www.nikoli.co.jp/en/)
-- `ctc`: 2565 puzzles featured in the CTC channel
+- **数独ベンチマークデータセット**：推論モデルのための新しい評価ベンチマーク
+- **ベースライン評価コード**：マルチターン数独解決における現在のLLM（大規模言語モデル）を評価するためのベースラインコード
+- **SudokuPadツール**：[Sven Neumann](https://svencodes.com/)氏が作成した[SudokuPad](https://sudokupad.app/)アプリとの連携ツール
+- **Cracking the Crypticの推論トレース**：Cracking the Crypticから抽出した数千時間の推論トレース（YouTubeビデオから直接抽出した言語的推論トランスクリプトとSudokuPadの状態-アクションシーケンスを含む）
 
-### `challenge_100` puzzle dataset
+## 数独ベンチマークパズルデータセット
 
-![Image](https://github.com/user-attachments/assets/a9a117e4-818b-4739-a46a-3f567e5fdca1)
+[**Sudoku-Bench**](https://huggingface.co/datasets/SakanaAI/Sudoku-Bench)パズルデータセットには、以下の3つのサブセットが含まれています：
+- `challenge_100`：推論モデルを評価するためのコアベンチマークとして設計された100個の数独パズル
+- `nikoli_100`：[ニコリ](https://www.nikoli.co.jp/en/)が提供する100個の手作り標準数独パズル
+- `ctc`：CTCチャンネルで紹介された2565個のパズル
 
-`challenge_100` includes:
-- 15 4×4 puzzles
-- 15 6×6 puzzles
-- 50 9×9 puzzles
-- 20 of the more difficult standard Sudoku puzzles from the `nikoli_100` set
+### challenge_100パズルデータセット
 
-The `challenge_100` is designed to evaluate models on a diverse set of logical and creative reasoning. The 50 9×9 puzzles were selected by the hosts of CTC. These puzzles range broadly in difficulty--from elegantly simple to extremely challenging--to thoroughly test AI reasoning capabilities.
+![画像](https://github.com/user-attachments/assets/a9a117e4-818b-4739-a46a-3f567e5fdca1)
 
-The 4×4 and 6×6 puzzles offer an easier on-ramp for reasoning models, maintaining the creative qualities of the larger puzzles, but alleviating some need for long-context reasoning.
+`challenge_100`には以下が含まれています：
+- 15個の4×4パズル
+- 15個の6×6パズル
+- 50個の9×9パズル
+- `nikoli_100`セットからより難しい標準数独パズル20個
 
-### `nikoli_100` puzzle dataset
+`challenge_100`は、多様な論理的・創造的推論能力でモデルを評価するために設計されています。50個の9×9パズルはCTCのホストによって選ばれました。これらのパズルは、エレガントにシンプルなものから非常に難しいものまで、幅広い難易度を持ち、AIの推論能力を徹底的にテストします。
 
-![Image](https://github.com/user-attachments/assets/5a670d14-af67-4a11-8063-988c529f8d9e)
+4×4と6×6のパズルは、推論モデルにとってより簡単な入門となり、大きなパズルの創造的な特性を維持しながらも、長いコンテキスト推論の必要性を軽減します。
 
-We partnered with [Nikoli](https://www.nikoli.co.jp/en/), the Japanese puzzle company that popularized Sudoku in the 1980s, to curate a set of 100 beautiful handmade standard Sudoku puzzles.
+### nikoli_100パズルデータセット
 
-### `ctc` puzzle dataset
+![画像](https://github.com/user-attachments/assets/5a670d14-af67-4a11-8063-988c529f8d9e)
 
-![Image](https://github.com/user-attachments/assets/18023272-7eee-4a34-a1fb-2eb75211e80f)
+私たちは、1980年代に数独を普及させた日本のパズル会社[ニコリ](https://www.nikoli.co.jp/en/)と提携し、100個の美しい手作りの標準数独パズルをキュレーションしました。
 
-The `ctc` dataset contains 2565 puzzles featured in the CTC channel.
+### ctcパズルデータセット
 
-## Two ways to play
+![画像](https://github.com/user-attachments/assets/18023272-7eee-4a34-a1fb-2eb75211e80f)
 
-We provide two ways to interact with **Sudoku-Bench** puzzles.
+`ctc`データセットには、CTCチャンネルで紹介された2565個のパズルが含まれています。
 
-#### Text-only
-  - Use a text representation of each puzzle. The simplest way to evaluate any LLM on **Sudoku-Bench**.
+## 利用方法：2つのアプローチ
 
-#### SudokuPad app
-  - Use the SudokuPad game engine in-the-loop. This allows for:
-    - Screenshots of the sudoku board for VLM-based models
-    - Note-taking methods that are commonly used by human solvers such as pencil marks for candidate digits and color-coding of cells
+**Sudoku-Bench**パズルとの対話には、2つの方法を提供しています。
 
-### Method 1: Text-only
+#### 方法1：テキストのみ
+  - 各パズルのテキスト表現を使用します。**Sudoku-Bench**でLLMを評価する最もシンプルな方法です。
 
-<p align="center"><img width="500" alt="Image" src="https://github.com/user-attachments/assets/cec5a3ed-1462-4c66-9443-8b095b0d72f1" /></p>
+#### 方法2：SudokuPadアプリ
+  - SudokuPadゲームエンジンをループ内で使用します。これにより以下が可能になります：
+    - VLM（視覚言語モデル）ベースのモデル用の数独ボードのスクリーンショット
+    - 候補数字のペンシルマークやセルのカラーコーディングなど、人間のソルバーが一般的に使用するメモ取り方法
+
+### 方法1：テキストのみ
+
+<p align="center"><img width="500" alt="画像" src="https://github.com/user-attachments/assets/cec5a3ed-1462-4c66-9443-8b095b0d72f1" /></p>
 
 <p align="center">
-  <sub><a href="https://sudokupad.app/6bxd0ipaky">"Differences Count - part 1" by Sujoyku and Marty Sears</a></sub>
+  <sub><a href="https://sudokupad.app/6bxd0ipaky">「Differences Count - part 1」by Sujoyku and Marty Sears</a></sub>
 </p>
 
-Sudoku variants like those seen in **Sudoku-Bench** contain unique rules and visual elements.
+**Sudoku-Bench**に見られるような数独バリアントには、独自のルールと視覚的要素が含まれています。
 
-Each puzzle in **Sudoku-Bench** includes a structured text representation of its visual elements using `rxcy` coordinate notation. This is stored in the `visual_elements` field of each puzzle. Together with the `rules` and `initial_board` fields, one can construct a text-only prompt. This text-based representation facilitates easy evaluation and integration with LLMs without the need for visual processing.
+**Sudoku-Bench**の各パズルには、`rxcy`座標表記を使用した視覚的要素の構造化されたテキスト表現が含まれています。これは各パズルの`visual_elements`フィールドに格納されています。`rules`と`initial_board`フィールドと合わせて、テキストのみのプロンプトを構築できます。このテキストベースの表現により、視覚的処理を必要とせずにLLMとの簡単な評価と統合が可能になります。
 
-See the end-to-end evaluation example in [`src/eval`](src/eval).
+[`src/eval`](src/eval)のエンドツーエンド評価例をご覧ください。
 
-### Method 2: SudokuPad app
+### 方法2：SudokuPadアプリ
 
-<p align="center"><img width="500" alt="Image" src="https://github.com/user-attachments/assets/ffb7b7c3-49b7-4eba-be8b-965da7bae551" /></p>
+<p align="center"><img width="500" alt="画像" src="https://github.com/user-attachments/assets/ffb7b7c3-49b7-4eba-be8b-965da7bae551" /></p>
 
-The [SudokuPad](https://sudokupad.app/), created by [Sven Neumann](https://svencodes.com/) is a popular puzzle app that hosts thousands of Sudoku puzzles. SudokuPad enables standard puzzle-solving strategies, such as pencil marking candidate digits and cell color-coding.
+[Sven Neumann](https://svencodes.com/)氏が作成した[SudokuPad](https://sudokupad.app/)は、数千のパズルをホストする人気のパズルアプリです。SudokuPadは、候補数字のペンシルマークやセルのカラーコーディングなど、標準的なパズル解決戦略を可能にします。
 
-See the SudokuPad tools provided in [`src/sudokupad_interaction`](src/sudokupad_interaction).
+[`src/sudokupad_interaction`](src/sudokupad_interaction)で提供されているSudokuPadツールをご覧ください。
 
-## Getting started
+## 使い始める
 
-To get started, navigate to
+始めるには、以下にアクセスしてください：
 
-### Datasets
-- **Sudoku-Bench** on Hugging Face: [SakanaAI/Sudoku-Bench](https://huggingface.co/datasets/SakanaAI/Sudoku-Bench)
-- **Cracking the Cryptic (CTC) reasoning traces** on Hugging Face: [SakanaAI/Sudoku-CTC-Reasoning](https://huggingface.co/datasets/SakanaAI/Sudoku-CTC-Reasoning)
+### データセット
+- Hugging Faceの**Sudoku-Bench**：[SakanaAI/Sudoku-Bench](https://huggingface.co/datasets/SakanaAI/Sudoku-Bench)
+- Hugging Faceの**Cracking the Cryptic (CTC)推論トレース**：[SakanaAI/Sudoku-CTC-Reasoning](https://huggingface.co/datasets/SakanaAI/Sudoku-CTC-Reasoning)
 
-### This repository
-- [src/eval](src/eval) for example of how to evaluate LLMs on **Sudoku-Bench** text representations of puzzles
-- [src/sudokupad_interaction](src/sudokupad_interaction) for tools for interacting with the SudokuPad app
-- [src/ctc_processing](src/ctc_processing) for processing the CTC reasoning traces in an LM-compatible format
+### このリポジトリ
+- [`src/eval`](src/eval)：**Sudoku-Bench**のテキスト表現でLLMを評価する方法の例
+- [`src/sudokupad_interaction`](src/sudokupad_interaction)：SudokuPadアプリとの対話ツール
+- [`src/ctc_processing`](src/ctc_processing)：CTC推論トレースをLM互換形式に処理するためのツール
 
-## Partnerships
+## パートナーシップ
 
-This project is in partnership with [Cracking the Cryptic](https://www.youtube.com/c/CrackingTheCryptic). We are grateful to [Nikoli](https://www.nikoli.co.jp/en/) for curating the `nikoli_100` dataset. Puzzle creators featured on CTC and in this repository are gratefully acknowledged in [acknowledgements.md](acknowledgements.md). We are grateful to [Sven Neumann](https://svencodes.com/) for help.
+このプロジェクトは[Cracking the Cryptic](https://www.youtube.com/c/CrackingTheCryptic)とのパートナーシップによるものです。`nikoli_100`データセットをキュレーションしてくれた[ニコリ](https://www.nikoli.co.jp/en/)に感謝します。CTCで紹介されたパズル作成者とこのリポジトリは[acknowledgements.md](acknowledgements.md)で感謝の意を表しています。また、[Sven Neumann](https://svencodes.com/)氏のご協力に感謝します。
 
-## Contribute
+## 貢献について
 
-We welcome contributions to the **Sudoku-Bench**. Please note that we will not accept pull requests containing data scraped from YouTube channels or link to such data without evidence that they have explicit permission from the channel owner.
+**Sudoku-Bench**への貢献を歓迎します。YouTubeチャンネルからスクレイピングされたデータを含むプルリクエスト、またはチャンネル所有者から明示的な許可を得た証拠なしにそのようなデータへのリンクを含むプルリクエストは受け付けないことにご注意ください。
 
-## Citation
+## 引用
 ```bibtex
 @misc{seely2025sudoku-bench,
   title={{Sudoku-Bench}},

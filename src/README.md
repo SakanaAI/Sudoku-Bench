@@ -1,4 +1,4 @@
-- **[eval](eval/)**: Framework for evaluating LLMs on Sudoku puzzles through multi-round interaction protocols
-- **[sudokupad_interaction](sudokupad_interaction/)**: Tools for interacting with the SudokuPad app
-- **[ctc_processing](ctc_processing/)**: Utilities for processing CTC reasoning traces into LM-compatible formats
-- **[sudoku_ds.py](sudoku_ds.py)**: Python-only implementation of the Sudoku data structures
+- **[eval](eval/)**: マルチラウンド対話プロトコルを通じて数独パズルでLLM（大規模言語モデル）を評価するためのフレームワーク
+- **[sudokupad_interaction](sudokupad_interaction/)**: SudokuPadアプリと対話するためのツール
+- **[ctc_processing](ctc_processing/)**: CTC推論トレースをLM互換形式に処理するためのユーティリティ
+- **[sudoku_ds.py](sudoku_ds.py)**: 数独データ構造のPythonのみの実装

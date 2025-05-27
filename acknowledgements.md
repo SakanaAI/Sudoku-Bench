@@ -1,6 +1,6 @@
-### Setter acknowledgements
+### パズル作成者への謝辞
 
-The puzzles in the Sudoku-Bench datasets include puzzles that have been solved on the CTC channel and include the following puzzle authors:
+Sudoku-Benchデータセットに含まれるパズルは、CTCチャンネルで解かれたものであり、以下のパズル作成者によるものです：
 
 **'South Korea'**: "Fortress Sudoku"
 
