@@ -125,3 +125,20 @@ The system uses the following prompt components:
 - `PREFILLED_ASSISTANT_RESPONSE`: Initial LLM response
 
 The framework supports standard Sudoku rules as well as visual variants with additional constraints.
+
+### Update: GPT-5 Support Added (October 1, 2025)
+
+GPT-5 is now supported in the Sudoku Bench repository. Due to GPT-5's unique characteristics, we implemented the following configuration:
+
+**Default Configuration:**
+- **Tool use:** Disabled by default
+- **API timeout:** 30 minutes (GPT-5 occasionally exceeds standard timeouts when using high reasoning effort, and less frequently with medium reasoning effort)
+
+**Prompt Compatibility:**
+- GPT-5 uses the same input prompts as other models
+- GPT-5's internal reasoning traces are hidden by default
+- To expose reasoning insights, add this prompt suffix:
+```Finish with detailed insights on how to solve this problem, as if you are imparting insights to a learner.```
+
+**Expected Behavior:**
+- GPT-5 may abstain from answering puzzles when it has low confidence in its solution. OpenAI confirms this is intentional behavior designed to reduce hallucinations

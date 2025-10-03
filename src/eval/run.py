@@ -182,9 +182,27 @@ async def call_api(
                     kwargs["top_p"] = 0.95
                     kwargs["max_tokens"] = None
                 else:
-                    kwargs["max_tokens"] = min(args.max_tokens, 8192)
-                completion = await client.chat.completions.create(**kwargs)
-                output_text = completion.choices[0].message.content
+                    kwargs["max_tokens"] = args.max_tokens if args.max_tokens else 8192
+                
+                if "gpt-5" in model.lower():
+                    effort = model.split("-")[-1]
+                    kwargs['model'] = 'gpt-5'
+                    kwargs['input'] = kwargs['messages']
+                    kwargs.pop('temperature', None)
+                    kwargs.pop('top_p', None)
+                    kwargs.pop('messages', None)
+                    kwargs.pop('max_tokens', None)
+                    kwargs['reasoning'] = {
+                        "effort": effort,
+                        "summary": "detailed"
+                    }
+                    kwargs['tool_choice'] = None
+                    #gpt5 requires migration to the responses API
+                    completion = await client.responses.create(**kwargs)
+                    output_text = completion.output_text
+                else:
+                    completion = await client.chat.completions.create(**kwargs)
+                    output_text = completion.choices[0].message.content
             # Anthropic API
             elif isinstance(client, (anthropic.AsyncAnthropic, anthropic.AsyncAnthropicBedrock)):
                 kwargs = {
@@ -1027,6 +1045,8 @@ def main():
     if args.api == "openai":
         client = openai.AsyncOpenAI(
             api_key=os.environ.get("OPENAI_API_KEY"),
+            base_url="http://localhost:8000/v1" if "gpt" not in args.model.lower() else None,
+            timeout = 1800
         )
     elif args.api == "openrouter":
         client = openai.AsyncOpenAI(
