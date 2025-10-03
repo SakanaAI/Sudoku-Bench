@@ -128,7 +128,16 @@ The framework supports standard Sudoku rules as well as visual variants with add
 
 ### Update: GPT-5 Support Added (October 1, 2025)
 
-GPT-5 is now supported in the Sudoku Bench repository. Due to GPT-5's unique characteristics, we implemented the following configuration:
+GPT-5 is now supported in the Sudoku Bench repository. You can select the reasoning effort level by specifying the model parameter (e.g., `gpt-5-high`, `gpt-5-medium`, `gpt-5-low`):
+```bash
+python -m eval.run \
+    --dataset ${DATASET} \
+    --output_csv ../data/benchmark_results/${DATASET}/${MODEL}.csv \
+    --api ${API} \
+    --model gpt-5-high \
+    --batch_size 20
+``` 
+Due to GPT-5's unique characteristics, we implemented the following configuration:
 
 **Default Configuration:**
 - **Tool use:** Disabled by default
